@@ -1,0 +1,16 @@
+# Sample backend configuration for GCP Terraform backend
+
+# Define the GCP project
+project = "your-gcp-project-id"
+
+# Define the GCS bucket to store the Terraform state
+bucket = "your-terraform-state-bucket"
+
+# Define the path within the bucket to store the Terraform state file
+prefix = "terraform/state"
+
+# Define the region for the backend
+region = "your-gcp-region"
+
+# Define the credentials file for authentication
+credentials = "/path/to/your/credentials-file.json"
