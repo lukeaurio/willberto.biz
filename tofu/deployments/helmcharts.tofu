@@ -1,6 +1,8 @@
+
+
 module "helm" {
     source = "../modules/helm"
-    for_each = var.helm_releases
+    for_each = { for k,v in var.helm_releases : v.name => v }
 
     kubernetes_cluster_name = google_container_cluster.default.name
     project                 = var.project_id
@@ -8,7 +10,7 @@ module "helm" {
     helm_chart_name         = each.value.name
     helm_repository_url     = each.value.repo_url
     helm_namespace          = each.value.namespace
-    helm_chart_name         = each.value.chart
     helm_chart_version      = each.value.version
-    values                  = each.value.values
+    helm_value_file         = each.value.values_file
+    replica_count           = each.value.replica_count
 }

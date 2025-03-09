@@ -23,6 +23,11 @@ variable "helm_chart_name" {
     type        = string
 }
 
+variable "helm_value_file" {
+    description = "The path to the Helm chart"
+    type        = string
+}
+
 variable "helm_chart_version" {
     description = "The version of the Helm chart"
     type        = string

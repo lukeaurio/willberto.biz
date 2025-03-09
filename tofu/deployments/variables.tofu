@@ -45,7 +45,20 @@ variable "helm_releases" {
     repo_url  = string
     chart     = string
     version   = string
-    values    = string
+    values      = optional(list(string))
+    values_file = optional(string)
+    replica_count = number
   }))
-  default = {}
+  default = {
+    example_release = {
+      name      = ""
+      namespace = ""
+      repo_url  = ""
+      chart     = ""
+      version   = ""
+      values    = ""
+      values_file = ""
+      replica_count = 1
+    }
+  }
 }
