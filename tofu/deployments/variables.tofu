@@ -1,4 +1,10 @@
+# GCP Project Configuration
 variable "project" {
+  description = "The GCP Project ID"
+  type        = string
+}
+
+variable "project_id" {
   description = "The GCP Project ID"
   type        = string
 }
@@ -12,30 +18,38 @@ variable "region" {
   }
 }
 
+# Cloudflare Configuration
+variable "cloudflare_api_token" {
+  description = "The Cloudflare API Token"
+  type        = string
+}
+
+# Google Cloud Storage Buckets Configuration
 variable "buckets" {
   description = "Map of Google Cloud Storage buckets to create"
-  type        = map(object({
+  type = map(object({
     storage_class               = string
     public_access_prevention    = string
     uniform_bucket_level_access = bool
     versioning                  = optional(bool)
-    lifecycle_rules             = list(object({
+    lifecycle_rules = list(object({
       age  = number
       type = string
     }))
   }))
-  default     = {}
+  default = {}
 }
 
+# Helm Releases Configuration
 variable "helm_releases" {
   description = "Map of Helm releases to deploy"
-  type        = map(object({
+  type = map(object({
     name      = string
     namespace = string
-    repo_url  = string 
+    repo_url  = string
     chart     = string
     version   = string
     values    = string
   }))
-  default     = {}
+  default = {}
 }
