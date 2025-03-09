@@ -1,0 +1,10 @@
+// This settings.json file is configured for the Visual Studio Code workspace.
+// It includes a configuration for the Conventional Commits extension.
+// you can find that extension here: https://marketplace.visualstudio.com/items?itemName=vivaxy.vscode-conventional-commits
+// The "conventionalCommits.scopes" property specifies the scopes that can be used in commit messages.
+// This setup helps enforce a consistent commit message format, which is useful for maintaining a clean and understandable project history.
+{
+    "conventionalCommits.scopes": [
+        "helm"
+    ]
+}
