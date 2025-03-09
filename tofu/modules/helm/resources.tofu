@@ -9,6 +9,6 @@ resource "helm_release" "this" {
 
     set {
         name  = "replicaCount"
-        value = 2
+        value = var.replica_count
     }
 }

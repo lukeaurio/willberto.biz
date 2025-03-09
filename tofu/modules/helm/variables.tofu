@@ -32,3 +32,8 @@ variable "helm_namespace" {
     description = "The namespace in which to deploy the Helm release"
     type        = string
 }
+
+variable "replica_count" {
+    description = "The number of replicas to deploy"
+    type        = number
+}
