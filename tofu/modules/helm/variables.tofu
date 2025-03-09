@@ -3,23 +3,13 @@ variable "kubernetes_cluster_name" {
     type        = string
 }
 
-variable "kubernetes_cluster_endpoint" {
-    description = "The endpoint of the Kubernetes cluster"
+variable "project" {
+    description = "The GCP project ID"
     type        = string
 }
 
-variable "kubernetes_cluster_ca_certificate" {
-    description = "The CA certificate of the Kubernetes cluster"
-    type        = string
-}
-
-variable "kubernetes_admin_username" {
-    description = "The admin username for the Kubernetes cluster"
-    type        = string
-}
-
-variable "kubernetes_admin_password" {
-    description = "The admin password for the Kubernetes cluster"
+variable "region" {
+    description = "The region where the GKE cluster is located"
     type        = string
 }
 
@@ -35,11 +25,6 @@ variable "helm_chart_name" {
 
 variable "helm_chart_version" {
     description = "The version of the Helm chart"
-    type        = string
-}
-
-variable "helm_release_name" {
-    description = "The name of the Helm release"
     type        = string
 }
 

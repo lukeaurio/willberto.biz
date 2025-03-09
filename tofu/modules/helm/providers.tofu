@@ -1,11 +1,23 @@
+# Retrieve an access token as the Terraform runner
+data "google_client_config" "provider" {}
+
+# Retrieve the cluster endpoint and CA certificate
+data "google_container_cluster" "my_cluster" {
+  name     = var.kubernetes_cluster_namecluster_name
+  project  = var.project
+  location = var.region
+}
+
 provider "helm" {
   kubernetes {
-    host                   = var.cluster_endpoint #data.aws_eks_cluster.cluster.endpoint
-    cluster_ca_certificate = base64decode(var.cluser_certificate) #data.aws_eks_cluster.cluster.certificate_authority.0.data
+    host  = "https://${data.google_container_cluster.my_cluster.endpoint}"
+    token = data.google_client_config.provider.access_token
+    cluster_ca_certificate = base64decode(
+      data.google_container_cluster.my_cluster.master_auth[0].cluster_ca_certificate,
+    )
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "get-token", "--cluster-name", var.cluster_name] #data.aws_eks_cluster.cluster.name
-      command     = "aws"
+      command     = "gke-gcloud-auth-plugin"
     }
   }
 }

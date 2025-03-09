@@ -6,6 +6,10 @@ variable "project" {
 variable "region" {
   description = "The region for the GCP resources"
   type        = string
+  validation {
+    condition     = contains(["us-central1", "us-east1", "us-east4", "us-west1", "us-west2", "us-west3", "us-west4"], var.region)
+    error_message = "The region must be one of the US regions: us-central1, us-east1, us-east4, us-west1, us-west2, us-west3, us-west4."
+  }
 }
 
 variable "buckets" {
@@ -19,6 +23,19 @@ variable "buckets" {
       age  = number
       type = string
     }))
+  }))
+  default     = {}
+}
+
+variable "helm_releases" {
+  description = "Map of Helm releases to deploy"
+  type        = map(object({
+    name      = string
+    namespace = string
+    repo_url  = string 
+    chart     = string
+    version   = string
+    values    = string
   }))
   default     = {}
 }
