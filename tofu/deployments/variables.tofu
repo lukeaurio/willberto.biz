@@ -1,8 +1,4 @@
 # GCP Project Configuration
-variable "project" {
-  description = "The GCP Project ID"
-  type        = string
-}
 
 variable "project_id" {
   description = "The GCP Project ID"

@@ -3,7 +3,7 @@ module "helm" {
     for_each = var.helm_releases
 
     kubernetes_cluster_name = google_container_cluster.default.name
-    project                 = var.project
+    project                 = var.project_id
     region                  = var.region
     helm_chart_name         = each.value.name
     helm_repository_url     = each.value.repo_url
