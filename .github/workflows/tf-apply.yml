@@ -22,6 +22,5 @@ jobs:
       uses: './.github/actions/auth_to_gcp'
       with:
         gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
-        gcp_project_num: ${{ secrets.GCP_PROJECT_NUM }}
         gcp_workload_pool: ${{ secrets.GCP_WORKLOAD_POOL }}
         gcp_workload_provider: ${{ secrets.GCP_WORKLOAD_PROVIDER }}
