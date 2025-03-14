@@ -25,7 +25,7 @@ runs:
       uses: 'google-github-actions/auth@v2'
       with:
           project_id: '${{ inputs.gcp_project_id }}'
-          workload_identity_provider: 'projects/${{ inputs.gcp_project_id }}/locations/global/workloadIdentityPools/${{ inputs.gcp_workload_pool }}/providers/${{ inputs.gcp_workload_provider }}'
+          workload_identity_provider: '//iam.googleapis.com/projects/${{ inputs.gcp_project_id }}/locations/global/workloadIdentityPools/${{ inputs.gcp_workload_pool }}/providers/${{ inputs.gcp_workload_provider }}'
         
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v2'
