@@ -1,0 +1,34 @@
+name: Authenticate to GCP
+
+description: This action authenticates to Google Cloud Platform using a service account key.
+
+inputs:
+    gcp_project_id:
+        description: 'The GCP project ID'
+        required: true
+    gcp_project_num:
+        description: 'The GCP project number'
+        required: true
+    gcp_workload_pool:
+        description: 'The GCP workload provider'
+        required: true
+    gcp_workload_provider:
+        description: 'The GCP workload provider'
+        required: true
+
+outputs:
+    gcp_project_id:
+        description: 'The GCP project ID'
+
+runs:
+    using: 'composite'
+    steps:
+    - name: 'Authenticate with GCP'
+      id: auth
+      uses: 'google-github-actions/auth@v2'
+      with:
+          project_id: '${{ inputs.gcp_project_id }}'
+          workload_identity_provider: 'projects/${{ inputs.gcp_project_num }}/locations/global/workloadIdentityPools/${{ inputs.gcp_workload_pool }}/providers/${{ inputs.gcp_workload_provider }}'
+        
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
