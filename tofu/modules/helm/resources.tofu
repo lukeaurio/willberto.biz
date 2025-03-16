@@ -1,6 +1,6 @@
-data "template_file" "helm_chart_path" {
-    count = var.helm_chart_path != "" ? 1 : 0
-    template = var.helm_chart_path
+locals {
+    yaml_content = var.helm_value_file != "" ? yamldecode(file("${path.module}/${var.helm_value_file}/config.yaml")) : {}
+    variables_list = var.helm_value_file != "" ? concat([for k, v in local.yaml_content : { key = k, value = v }], var.helm_values) : var.helm_values
 }
 
 resource "helm_release" "this" {
@@ -10,7 +10,7 @@ resource "helm_release" "this" {
     version    = var.helm_chart_version
     namespace  = var.helm_namespace
 
-    values = [file("${path.module}/${var.helm_chart_path}/values.yaml")]
+    values = local.variables_list
 
     set {
         name  = "replicaCount"
