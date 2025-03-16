@@ -28,7 +28,7 @@ terraform {
   #  path = "configs/willbertobiz.tfstate"
   #}
   backend "gcs" {
-    bucket      = "willberto_tfstates" #<your Bucket here!>
+    bucket      = var.tfstates_bucket #<your Bucket here!>
     prefix      = "willberto_site"     #<Make this whatever hugh like!>
   }
 }
