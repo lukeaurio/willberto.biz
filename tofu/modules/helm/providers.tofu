@@ -8,6 +8,8 @@ data "google_container_cluster" "my_cluster" {
   location = var.region
 }
 
+
+# We're configuring the Helm provider in the module definition, Mostly because we're writing this in a way that we can build multiple clusters with the same module
 provider "helm" {
   kubernetes {
     host  = "https://${data.google_container_cluster.my_cluster.endpoint}"
