@@ -1,9 +1,7 @@
-# To-Do List for October 5, 2023
-
-- [ ] Task 1: Set up basic cluster with module and gcp
-- [ ] Task 2: Set up helm deployments using module and add ghost and setup
-- [ ] Task 3: Make all builds use my custom git actions runner
-- [ ] Task 4: Add cloudflare and setup dns using terraform in the extant deployments
-- [ ] Task 5: Automate github actions
-- [ ] Task 6: Add monitoring and logging
-- [ ] Task 7: document the living crap aout of this
+# To-Do List for March 23, 2025
+- [ ] Task 1: Set up Kubernetes SAs and namespaces post cluster creation (probably gonna need a Kube Module)
+- [ ] Task 2: Create IAM Access to my Bucket(s) for GCSFuse from the created cluster
+- [ ] Task 3: Make the deployment use module dependencies for clean code
+- [ ] Task 4: Set up a truly basic helm (or just straight up pod deployment) to test GCSFuse connectivity
+- [ ] Task 5: Get Ghost running internally on cluster using GCSFuse backing
+- [ ] Task 6: Add Cloudflare pod/helm as the frontend using my already done tunnels
