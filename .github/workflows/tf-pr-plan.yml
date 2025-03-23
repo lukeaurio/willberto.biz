@@ -3,6 +3,10 @@ name: Deploy code to GCP
 on:
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'terraform/**'
+      - 'modules/**'
+      - 'helm/**'
 
   workflow_dispatch:
 
