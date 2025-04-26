@@ -1,7 +1,7 @@
 resource "google_storage_bucket" "this" {
 
-  name                        = var.key
-  location                    = var.region
+  name                        = var.name
+  location                    = var.location
   project                     = var.project
   storage_class               = var.storage_class
   public_access_prevention    = var.public_access_prevention
