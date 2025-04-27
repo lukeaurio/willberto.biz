@@ -12,7 +12,8 @@ variable "region" {
   sensitive   = true
   validation {
     condition     = contains(["us-central1", "us-east1", "us-east4", "us-west1", "us-west2", "us-west3", "us-west4"], var.region)
-    error_message = "The region must be one of the US regions: us-central1, us-east1, us-east4, us-west1, us-west2, us-west3, us-west4."
+    error_message = "The region must be one of the US regions: us-central1, us-east1, us-east4, us-west1, us-west2, us-west3, us-west4.
+    "
   }
 }
 
@@ -31,7 +32,7 @@ variable "cloudflare_api_token" {
 
 # Google Cloud Storage Buckets Configuration
 variable "buckets" {
-  description = "Map of Google Cloud Storage buckets to create"
+  description = "Map of GCS buckets to create"
   type = map(object({
     storage_class               = string
     public_access_prevention    = string
