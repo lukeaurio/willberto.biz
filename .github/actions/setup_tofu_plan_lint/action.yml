@@ -1,0 +1,55 @@
+name: 'Setup OpenTofu and Lint'
+description: 'A composite action to setup and run OpenTofu commands'
+
+inputs:
+  tofu_directory:
+    description: 'The directory where OpenTofu files are located'
+    required: true
+    default: '.'
+  tofuvars_location:
+    description: 'The location of the OpenTofu''
+    required: true
+    default: 'tofu.tf'
+
+outputs:
+  fmt:
+    description: 'The result of the OpenTofu fmt command'
+    value: ${{ steps.fmt.outputs.stdout }}
+  init:
+    description: 'The result of the OpenTofu init command'
+    value: ${{ steps.init.outputs.stdout }}
+  validate:
+    description: 'The result of the OpenTofu validate command'
+    value: ${{ steps.validate.outputs.stdout }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set Up Opentofu
+      uses: opentofu/setup-opentofu@v1
+
+    - name: OpenTofu fmt
+      id: fmt
+      run: tofu fmt -check 
+      shell: bash
+      continue-on-error: true
+    
+    - name: OpenTofu Init
+      id: init
+      run: tofu init 
+      shell: bash
+    
+    - name: OpenTofu Validate
+      id: validate
+      run: tofu validate -no-color
+      shell: bash
+    
+    - name: OpenTofu Plan
+      id: plan
+      run: tofu plan -no-color
+      shell: bash
+      continue-on-error: true
+    
+    
+
+    
