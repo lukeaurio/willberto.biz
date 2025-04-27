@@ -13,10 +13,6 @@ inputs:
         description: 'The GCP workload provider'
         required: true
 
-outputs:
-    gcp_project_id:
-        description: 'The GCP project ID'
-
 runs:
     using: 'composite'
     steps:
