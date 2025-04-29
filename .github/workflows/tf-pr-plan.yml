@@ -22,6 +22,7 @@ jobs:
     - name: 'Checkout code'
       uses: 'actions/checkout@v4'
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
         repository: ${{ github.event.pull_request.head.repo.full_name }}
         ref: ${{ github.event.pull_request.head.ref }} #We need to make sure we get the right ref per the usage of add-and-commit
@@ -53,8 +54,8 @@ jobs:
       id: fix_fmt
       uses: EndBug/add-and-commit@v9
       with:
-        author_name: 'WillbertoBot'
-        author_email: 'bot@willberto.biz'
+        author_name: 'lukeaurio'
+        author_email: 'lukeaurio@proton.me'
         committer_name: GitHub Actions
         committer_email: actions@github.com
         message: 'Fix formatting issues'
