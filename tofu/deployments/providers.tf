@@ -1,6 +1,6 @@
 provider "google" {
-  project = var.project_id
-  region  = var.region
+  project                         = var.project_id
+  region                          = var.region
   add_terraform_attribution_label = true
 }
 
@@ -28,7 +28,7 @@ terraform {
   #  path = "configs/willbertobiz.tfstate"
   #}
   backend "gcs" {
-    bucket      = var.tfstates_bucket #<your Bucket here!>
-    prefix      = "willberto_site"     #<Make this whatever hugh like!>
+    bucket = var.tfstates_bucket #<your Bucket here!>
+    prefix = "willberto_site"    #<Make this whatever hugh like!>
   }
 }

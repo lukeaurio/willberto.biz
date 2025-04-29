@@ -1,5 +1,5 @@
 resource "google_compute_network" "default" {
-name = "${var.project_id}-network"
+  name = "${var.project_id}-network"
 
   auto_create_subnetworks  = false
   enable_ula_internal_ipv6 = true
