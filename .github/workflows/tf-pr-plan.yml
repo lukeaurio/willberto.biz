@@ -61,6 +61,7 @@ jobs:
       uses: 'mshick/add-pr-comment@v2'
       if: ${{ steps.fmt.outputs.stderr }} != ''
       with:
+        message-id: ${{ github.event.pull_request.id }}-ErrComment
         message: |
           ### ⚠️ Formatting Issues Detected! 🛠️
           Formatting issues were detected in the Tofu code
@@ -83,6 +84,7 @@ jobs:
       uses: 'mshick/add-pr-comment@v2'
       if: ${{ steps.fmt.outputs.tofu_fmt_count }} > 0 && ${{ steps.fmt.outputs.stderr }} == ''
       with:
+        message-id: ${{ github.event.pull_request.id }}-SuccessComment
         message: |
           ### ✅ Formatting Issues Resolved! 🎉
           All formatting issues have been resolved in the Tofu code.
