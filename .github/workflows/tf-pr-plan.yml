@@ -66,12 +66,11 @@ jobs:
           ### ⚠️ Formatting Issues Detected! 🛠️
           Formatting issues were detected in the Tofu code.
           Click below to view the details of the errors:
-
+          <details>
           <summary>🔍 View Formatting Errors</summary>
 
-          ```plaintext
           ${{ steps.fmt.outputs.stderr }}
-          ```
+          </details>
 
 
           Keep trying, Kiddo! 🚀
