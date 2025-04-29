@@ -36,10 +36,9 @@ jobs:
       shell: bash
 
     - name: Check for Errors in Formatting Step
-      if: ${{ steps.fmt.outputs.stderr }} != ''
+
       run: |
         echo "Formatting error detected: ${{ steps.fmt.outputs.stderr }}"
-        exit 1
       shell: bash
     
     - name: Conditionally Run if Formatting Issues Exist
@@ -66,13 +65,46 @@ jobs:
     
     - name: PR Comment (if Error)
       uses: 'mshick/add-pr-comment@v2'
+      if: ${{ steps.fmt.outputs.stderr }} != ''
       with:
         message: |
-          Formatting issues detected in the Tofu code. Automatically fixed.
-          ${{ steps.fmt.outputs.tofu_fmt_list }}
-        message-failure: |
-          Formatting issues detected in the Tofu code. Please check the PR for details.
+          ### ⚠️ Formatting Issues Detected! 🛠️
+          Formatting issues were detected in the Tofu code
+          Click below to view the details of the errors:
+
+          <details>
+          <summary>🔍 View Formatting Errors</summary>
+
+          ```
           ${{ steps.fmt.outputs.stderr }}
+          ```
+
+          </details>
+
+          Keep trying, Kiddo! 🚀
+        message-failure: |
+          Errors detected in the Tofu formatting step. Please check the logs for details.
+    
+    - name: PR Comment (if No Error)
+      uses: 'mshick/add-pr-comment@v2'
+      if: ${{ steps.fmt.outputs.tofu_fmt_count }} > 0
+      with:
+        message: |
+          ### ✅ Formatting Issues Resolved! 🎉
+          All formatting issues have been resolved in the Tofu code.
+          Make sure to thank the Bot!
+          Click below to view the files taht have changed:
+
+          <details>
+          <summary>🔍 View Changes</summary>
+
+          ```
+          ${{ steps.fmt.outputs.tofu_fmt_list }}
+          ```
+
+          </details>
+
+          Great job, Kiddo! 🚀
     
 
   tofu_plan:
