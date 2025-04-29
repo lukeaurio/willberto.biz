@@ -64,13 +64,13 @@ jobs:
         message-id: ErrComment
         message: |
           ### ⚠️ Formatting Issues Detected! 🛠️
-          Formatting issues were detected in the Tofu code
+          Formatting issues were detected in the Tofu code.
           Click below to view the details of the errors:
 
           <details>
           <summary>🔍 View Formatting Errors</summary>
 
-          ```
+          ```plaintext
           ${{ steps.fmt.outputs.stderr }}
           ```
 
@@ -82,7 +82,7 @@ jobs:
     
     - name: PR Comment (if No Error)
       uses: 'mshick/add-pr-comment@v2'
-      if: ${{ steps.fmt_plan.outputs.tofu_fmt_list }} != ''
+      if: ${{ steps.fmt.outputs.tofu_fmt_count }} > 0 && ${{ steps.fmt.outputs.stderr }} == ''
       with:
         message-id: SuccessComment
         message: |
@@ -94,7 +94,7 @@ jobs:
           <details>
           <summary>🔍 View Changes</summary>
 
-          ```
+          ```plaintext
           ${{ steps.fmt_plan.outputs.tofu_fmt_list }}
           ```
 
