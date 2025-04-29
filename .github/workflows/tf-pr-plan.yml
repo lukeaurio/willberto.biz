@@ -34,12 +34,7 @@ jobs:
         OUTPUT=$(tofu fmt -check -recursive ./tofu | wc -l) || true
         echo "tofu_fmt_count=$OUTPUT" >> $GITHUB_ENV
       shell: bash
-
-    - name: Check for Errors in Formatting Step
-
-      run: |
-        echo "Formatting error detected: ${{ steps.fmt.outputs.stderr }}"
-      shell: bash
+      continue-on-error: true
     
     - name: Conditionally Run if Formatting Issues Exist
       id: fmt_plan
@@ -50,6 +45,7 @@ jobs:
         echo "tofu_fmt_list=$FILES_CHANGED" >> $GITHUB_ENV
         echo "Formatting issues fixed."
       shell: bash
+      continue-on-error: true
     
     - name: Commit Formatting Fixes
       if: ${{ steps.fmt.outputs.tofu_fmt_count }} > 0
@@ -106,6 +102,11 @@ jobs:
 
           Great job, Kiddo! 🚀
     
+    - name: Potential Failure        
+      if: ${{ steps.fmt.outputs.stderr }} != ''
+      run: |
+        echo "Errors found in Formatting lint detected. Failing the job."
+        exit 1
 
   tofu_plan:
     runs-on: ubuntu-latest
