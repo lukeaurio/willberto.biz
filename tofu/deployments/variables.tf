@@ -31,7 +31,7 @@ variable "cloudflare_api_token" {
 
 # Google Cloud Storage Buckets Configuration
 variable "buckets" {
-  description = "Map of Google Cloud Storage buckets to create"
+  description = "Map of GCS buckets to create"
   type = map(object({
     storage_class               = string
     public_access_prevention    = string
@@ -49,24 +49,24 @@ variable "buckets" {
 variable "helm_releases" {
   description = "Map of Helm releases to deploy"
   type = map(object({
-    name      = string
-    namespace = string
-    repo_url  = string
-    chart     = string
-    version   = string
-    values      = optional(list(string))
-    values_file = optional(string)
+    name          = string
+    namespace     = string
+    repo_url      = string
+    chart         = string
+    version       = string
+    values        = optional(list(string))
+    values_file   = optional(string)
     replica_count = number
   }))
   default = {
     example_release = {
-      name      = ""
-      namespace = ""
-      repo_url  = ""
-      chart     = ""
-      version   = ""
-      values    = ""
-      values_file = ""
+      name          = ""
+      namespace     = ""
+      repo_url      = ""
+      chart         = ""
+      version       = ""
+      values        = ""
+      values_file   = ""
       replica_count = 1
     }
   }
