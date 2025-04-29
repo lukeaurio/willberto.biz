@@ -49,24 +49,24 @@ variable "buckets" {
 variable "helm_releases" {
   description = "Map of Helm releases to deploy"
   type = map(object({
-    name      = string
-    namespace = string
-    repo_url  = string
-    chart     = string
-    version   = string
-    values      = optional(list(string))
-    values_file = optional(string)
+    name          = string
+    namespace     = string
+    repo_url      = string
+    chart         = string
+    version       = string
+    values        = optional(list(string))
+    values_file   = optional(string)
     replica_count = number
   }))
   default = {
     example_release = {
-      name      = ""
-      namespace = ""
-      repo_url  = ""
-      chart     = ""
-      version   = ""
-      values    = ""
-      values_file = ""
+      name          = ""
+      namespace     = ""
+      repo_url      = ""
+      chart         = ""
+      version       = ""
+      values        = ""
+      values_file   = ""
       replica_count = 1
     }
   }
