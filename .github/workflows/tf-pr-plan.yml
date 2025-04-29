@@ -1,4 +1,4 @@
-name: Deploy code to GCP
+name: Terraform Plan and Comment
 
 on:
   pull_request:
@@ -47,7 +47,7 @@ jobs:
       run: |
         echo "Formatting issues detected. Fixing..."
         FILES_CHANGED=$(find ./tofu -mindepth 1 -type d -exec tofu fmt {} \;)
-        echo "tofu_fmt_list=$FILES_CHANGED" >> $GITHUB_ENV
+        echo "tofu_fmt_list=$FILES_CHANGED" >> $GITHUB_ENV"
         echo "Formatting issues fixed."
       shell: bash
     
