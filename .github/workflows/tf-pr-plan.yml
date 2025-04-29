@@ -31,7 +31,7 @@ jobs:
     - name: Check TofuFormatting 
       id: fmt
       run: |
-        OUTPUT=$(find ./tofu -mindepth 1 -type d -exec tofu fmt -check {} \; | wc -l)
+        OUTPUT=$(tofu fmt -check ./tofu | wc -l)
         echo "tofu_fmt_count=$OUTPUT" >> $GITHUB_ENV
       shell: bash
 
@@ -46,8 +46,8 @@ jobs:
       if: ${{ steps.fmt.outputs.tofu_fmt_count }} > 0
       run: |
         echo "Formatting issues detected. Fixing..."
-        FILES_CHANGED=$(find ./tofu -mindepth 1 -type d -exec tofu fmt {} \;)
-        echo "tofu_fmt_list=$FILES_CHANGED" >> $GITHUB_ENV"
+        FILES_CHANGED=$(tofu fmt -diff -recursive ./tofu) || true
+        echo "tofu_fmt_list=$FILES_CHANGED" >> $GITHUB_ENV
         echo "Formatting issues fixed."
       shell: bash
     
