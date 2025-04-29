@@ -31,7 +31,7 @@ jobs:
     - name: Check TofuFormatting 
       id: fmt
       run: |
-        OUTPUT=$(tofu fmt -check ./tofu | wc -l)
+        OUTPUT=$(tofu fmt -check -recursive ./tofu | wc -l) || true
         echo "tofu_fmt_count=$OUTPUT" >> $GITHUB_ENV
       shell: bash
 
