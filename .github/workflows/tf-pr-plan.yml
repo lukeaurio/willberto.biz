@@ -82,7 +82,7 @@ jobs:
     
     - name: PR Comment (if No Error)
       uses: 'mshick/add-pr-comment@v2'
-      if: ${{ steps.fmt.outputs.tofu_fmt_count }} > 0
+      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }}
       with:
         refresh-message-position: true
         message-id: ${{ github.event.pull_request.id }}-SUCCESS
