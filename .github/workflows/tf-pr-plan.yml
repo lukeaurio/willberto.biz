@@ -67,14 +67,12 @@ jobs:
           Formatting issues were detected in the Tofu code.
           Click below to view the details of the errors:
 
-          <details>
           <summary>🔍 View Formatting Errors</summary>
 
           ```plaintext
           ${{ steps.fmt.outputs.stderr }}
           ```
 
-          </details>
 
           Keep trying, Kiddo! 🚀
         message-failure: |
@@ -91,14 +89,12 @@ jobs:
           Make sure to thank the Bot!
           Click below to view the files taht have changed:
 
-          <details>
           <summary>🔍 View Changes</summary>
 
           ```plaintext
           ${{ steps.fmt_plan.outputs.tofu_fmt_list }}
           ```
 
-          </details>
 
           Great job, Kiddo! 🚀
     
