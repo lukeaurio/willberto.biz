@@ -14,10 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       fmt: ${{ steps.fmt.outputs.tofu_fmt_count }}
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
     - name: 'Checkout code'
       uses: 'actions/checkout@v4'
