@@ -68,7 +68,7 @@ jobs:
           Click below to view the details of the errors:
           <details>
           <summary>🔍 View Formatting Errors</summary>
-          ```plaintext
+          ```
           ${{ steps.fmt.outputs.stderr }}
           ```
           </details>
@@ -91,7 +91,7 @@ jobs:
           <details>
           <summary>🔍 View Changes</summary>
 
-          ```plaintext
+          ```
           ${{ steps.fmt_plan.outputs.tofu_fmt_list }}
           ```
           </details>
