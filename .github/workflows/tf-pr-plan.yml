@@ -71,7 +71,7 @@ jobs:
           <summary>🔍 View Formatting Errors</summary>
 
           ```
-          ${{ steps.fmt.outputs.stderr }}
+          ${{ toJSON(steps.fmt.outputs.stderr) }}
           ```
 
           </details>
@@ -82,7 +82,7 @@ jobs:
     
     - name: PR Comment (if No Error)
       uses: 'mshick/add-pr-comment@v2'
-      if: ${{ steps.fmt.outputs.tofu_fmt_count }} > 0 && ${{ steps.fmt.outputs.stderr }} == ''
+      if: ${{ steps.fmt.outputs.stderr }} == ''
       with:
         message-id: ${{ github.event.pull_request.id }}-SuccessComment
         message: |
@@ -95,7 +95,7 @@ jobs:
           <summary>🔍 View Changes</summary>
 
           ```
-          ${{ steps.fmt_plan.outputs.tofu_fmt_list }}
+          ${{ toJson(steps.fmt_plan.outputs.tofu_fmt_list) }}
           ```
 
           </details>
