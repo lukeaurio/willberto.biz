@@ -36,7 +36,7 @@ jobs:
       shell: bash
 
     - name: Check for Errors in Formatting Step
-      if: steps.fmt.outputs.stderr != ''
+      if: ${{ steps.fmt.outputs.stderr }} != ''
       run: |
         echo "Formatting error detected: ${{ steps.fmt.outputs.stderr }}"
         exit 1
@@ -44,15 +44,16 @@ jobs:
     
     - name: Conditionally Run if Formatting Issues Exist
       id: fmt_plan
-      if: steps.fmt.outputs.tofu_fmt_count > 0
+      if: ${{ steps.fmt.outputs.tofu_fmt_count }} > 0
       run: |
         echo "Formatting issues detected. Fixing..."
-        find ./tofu -mindepth 1 -type d -exec tofu fmt {} \;
+        FILES_CHANGED=$(find ./tofu -mindepth 1 -type d -exec tofu fmt {} \;)
+        echo "tofu_fmt_list=$FILES_CHANGED" >> $GITHUB_ENV
         echo "Formatting issues fixed."
       shell: bash
     
     - name: Commit Formatting Fixes
-      if: steps.fmt.outputs.tofu_fmt_count > 0
+      if: ${{ steps.fmt.outputs.tofu_fmt_count }} > 0
       id: fix_fmt
       uses: EndBug/add-and-commit@v9
       with:
@@ -62,6 +63,17 @@ jobs:
         committer_email: actions@github.com
         message: 'Fix formatting issues'
         add: 'tofu/**'
+    
+    - name: PR Comment (if Error)
+      uses: 'mshick/add-pr-comment@v2'
+      with:
+        message: |
+          Formatting issues detected in the Tofu code. Automatically fixed.
+          ${{ steps.fmt.outputs.tofu_fmt_list }}
+        message-failure: |
+          Formatting issues detected in the Tofu code. Please check the PR for details.
+          ${{ steps.fmt.outputs.stderr }}
+    
 
   tofu_plan:
     runs-on: ubuntu-latest
