@@ -40,7 +40,9 @@ jobs:
       run: |
         echo "Formatting issues detected. Fixing..."
         FILES_CHANGED=$(tofu fmt -diff -recursive -no-color ./tofu) || true
-        echo "tofu_fmt_list=$FILES_CHANGED" >> $GITHUB_ENV
+        echo "tofu_fmt_list<<EOF" >> $GITHUB_ENV
+        echo "$FILES_CHANGED" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
         echo "Formatting issues fixed."
       shell: bash
       continue-on-error: true
