@@ -48,7 +48,7 @@ jobs:
       continue-on-error: true
     
     - name: Commit Formatting Fixes
-      if: ${{ steps.fmt.outputs.tofu_fmt_count }} > 0  && ${{ steps.fmt.outputs.stderr }} == ''
+      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }}
       id: fix_fmt
       uses: EndBug/add-and-commit@v9
       with:
@@ -61,7 +61,7 @@ jobs:
     
     - name: PR Comment (if Error)
       uses: 'mshick/add-pr-comment@v2'
-      if: ${{ steps.fmt.outputs.stderr }} != ''
+      if: ${{ toJson(steps.fmt.outputs.stderr) }} != ''
       with:
         refresh-message-position: true
         message-id: ${{ github.event.pull_request.id }}-ERROR
@@ -105,7 +105,7 @@ jobs:
           Great job, Kiddo! 🚀
     
     - name: Potential Failure        
-      if: ${{ steps.fmt.outputs.stderr }} != ''
+      if: ${{ toJson(steps.fmt.outputs.stderr) != ''}} 
       run: |
         echo "Errors found in Formatting lint detected. Failing the job."
         echo ${{ steps.fmt.outputs.stderr }}
