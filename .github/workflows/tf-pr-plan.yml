@@ -105,7 +105,7 @@ jobs:
           Great job, Kiddo! 🚀
     
     - name: Potential Failure        
-      if: ${{ toJson(steps.fmt.outputs.stderr) != '' }} 
+      if: ${{ steps.fmt.outputs.stderr }} 
       run: |
         echo "Errors found in Formatting lint detected. Failing the job."
         echo ${{ steps.fmt.outputs.stderr }}
