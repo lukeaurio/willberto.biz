@@ -48,7 +48,7 @@ jobs:
       continue-on-error: true
     
     - name: Commit Formatting Fixes
-      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }}
+      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }}  && ${{ toJson(steps.fmt.outputs.stderr) == ''}}
       id: fix_fmt
       uses: EndBug/add-and-commit@v9
       with:
