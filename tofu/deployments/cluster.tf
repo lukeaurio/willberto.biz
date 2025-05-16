@@ -6,7 +6,7 @@ resource "google_container_cluster" "default" {
   enable_l4_ilb_subsetting = true
 
   network    = google_compute_network.default.id
-  subnetwork     = google_compute_subnetwork.default.id
+  subnetwork = google_compute_subnetwork.default.id
 
   ip_allocation_policy {
     stack_type                    = "IPV4_IPV6"
