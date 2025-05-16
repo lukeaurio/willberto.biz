@@ -16,6 +16,16 @@ variable "region" {
   }
 }
 
+variable "zone" {
+  description = "The zone for the GCP resources"
+  type        = string
+  sensitive   = true
+  validation {
+    condition     = contains(["us-central1-a", "us-central1-b", "us-central1-c", "us-central1-f", "us-east1-b", "us-east1-c", "us-east1-d", "us-east4-a", "us-west1-a", "us-west1-b", "us-west2-a", "us-west2-b", "us-west3-a", "us-west3-b", "us-west4-a"], var.zone)
+    error_message = "The zone must be one of the US zones: us-central1-a, us-central1-b, us-central1-c, us-central1-f, us-east1-b, us-east1-c, us-east1-d, us-east4-a, us-west1-a, us-west1-b, us-west2-a, us-west2-b, us-west3-a, us-west3-b, us-west4-a."
+  }
+}
+
 variable "tfstates_bucket" {
   description = "The GCS bucket to store the Terraform state files"
   type        = string

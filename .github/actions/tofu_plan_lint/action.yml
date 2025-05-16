@@ -6,10 +6,6 @@ inputs:
     description: 'The directory where OpenTofu files are located'
     required: true
     default: '.'
-  tofuvars_location:
-    description: 'The location of the OpenTofu''
-    required: true
-    default: 'tofu.tf'
 
 outputs:
   fmt:
@@ -24,7 +20,11 @@ outputs:
 
 runs:
   using: 'composite'
+  working-directory: './tofu'
   steps:
+
+    - name: Set Up Opentofu
+      uses: opentofu/setup-opentofu@v1
 
     - name: OpenTofu Init
       id: init

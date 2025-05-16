@@ -1,6 +1,6 @@
 provider "google" {
-  project                         = var.project_id
   region                          = var.region
+  zone                            = var.zone
   add_terraform_attribution_label = true
 }
 
