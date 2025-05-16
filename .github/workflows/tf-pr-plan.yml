@@ -1,4 +1,4 @@
-name: Deploy code to GCP
+name: Terraform Plan and Comment
 
 on:
   pull_request:
@@ -14,16 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       fmt: ${{ steps.fmt.outputs.tofu_fmt_count }}
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
     - name: 'Checkout code'
       uses: 'actions/checkout@v4'
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
-        ref: ${{ github.head_ref }}
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
+        ref: ${{ github.event.pull_request.head.ref }} #We need to make sure we get the right ref per the usage of add-and-commit
     
     - name: Set Up Opentofu
       uses: opentofu/setup-opentofu@v1
@@ -31,31 +29,88 @@ jobs:
     - name: Check TofuFormatting 
       id: fmt
       run: |
-        OUTPUT=$(find ./tofu -mindepth 1 -type d -exec tofu fmt -check {} \; | wc -l)
+        OUTPUT=$(tofu fmt -check -recursive -no-color ./tofu | wc -l)
         echo "tofu_fmt_count=$OUTPUT" >> $GITHUB_ENV
-
       shell: bash
+      continue-on-error: true
     
     - name: Conditionally Run if Formatting Issues Exist
       id: fmt_plan
-      if: steps.fmt.outputs.tofu_fmt_count > 0
+      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }}
       run: |
         echo "Formatting issues detected. Fixing..."
-        find ./tofu -mindepth 1 -type d -exec tofu fmt {} \;
+        FILES_CHANGED=$(tofu fmt -diff -recursive -no-color ./tofu)
+        echo "tofu_fmt_list<<EOF" >> $GITHUB_ENV
+        echo "$FILES_CHANGED" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
         echo "Formatting issues fixed."
       shell: bash
+      continue-on-error: true
     
     - name: Commit Formatting Fixes
-      if: steps.fmt.outputs.tofu_fmt_count > 0
+      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }} && ${{ toJson(steps.fmt.outputs.stderr) == '' }}
       id: fix_fmt
       uses: EndBug/add-and-commit@v9
       with:
-        author_name: 'WillbertoBot'
-        author_email: 'bot@willberto.biz'
+        author_name: 'lukeaurio'
+        author_email: 'lukeaurio@proton.me'
         committer_name: GitHub Actions
         committer_email: actions@github.com
         message: 'Fix formatting issues'
         add: 'tofu/**'
+    
+    - name: PR Comment (if Error)
+      uses: 'mshick/add-pr-comment@v2'
+      if: ${{ steps.fmt.outputs.stderr }} 
+      with:
+        refresh-message-position: true
+        message-id: ${{ github.event.pull_request.id }}-ERROR
+        message: |
+          ### ⚠️ Formatting Issues Detected! 🛠️
+          Formatting issues were detected in the Tofu code.
+          Click below to view the details of the errors:
+          <details>
+          <summary>🔍 View Formatting Errors</summary>
+
+          ```
+          ${{ steps.fmt.outputs.stderr }}
+          ```
+
+          </details>
+
+          Keep trying, Kiddo! 🚀
+        message-failure: |
+          Errors detected in the Tofu formatting step. Please check the logs for details.
+    
+    - name: PR Comment (if No Error)
+      uses: 'mshick/add-pr-comment@v2'
+      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }}
+      with:
+        refresh-message-position: true
+        message-id: ${{ github.event.pull_request.id }}-SUCCESS
+        message: |
+          ### ✅ Formatting Issues Resolved! 🎉
+          All formatting issues have been resolved in the Tofu code.
+          Make sure to thank the Bot!
+          Click below to view the files that have changed:
+          <details>
+          <summary>🔍 View Changes</summary>
+
+          ```
+          ${{ steps.fmt_plan.outputs.tofu_fmt_list }}
+          ```
+
+          </details>
+
+          Great job, Kiddo! 🚀
+    
+    - name: Potential Failure        
+      if: ${{ steps.fmt.outputs.stderr }} 
+      run: |
+        echo "Errors found in Formatting lint detected. Failing the job."
+        echo ${{ steps.fmt.outputs.stderr }}
+        exit 1
+
   tofu_plan:
     runs-on: ubuntu-latest
     needs: setup
