@@ -13,6 +13,11 @@ variable "region" {
   type        = string
 }
 
+variable "helm_release_name" {
+  description = "The name of the Helm release to be created"
+  type        = string
+}
+
 variable "helm_repository_url" {
   description = "The URL of the Helm repository containing the chart"
   type        = string
