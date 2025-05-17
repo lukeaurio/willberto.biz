@@ -151,8 +151,7 @@ jobs:
 
     - name: 'Setup OpenTofu and Lint'
       id: tofu_plan_lint
-      with:
-        tofu_directory: ${{ env.TOFU_PATH }}
+      working-directory: ${{ env.TOFU_PATH }}
       uses: './.github/actions/tofu_plan_lint'
       env:
         TF_VAR_project: ${{ secrets.GCP_PROJECT_ID }}

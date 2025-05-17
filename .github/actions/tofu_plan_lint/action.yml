@@ -1,12 +1,6 @@
 name: 'Setup OpenTofu and Lint'
 description: 'A composite action to setup and run OpenTofu commands'
 
-inputs:
-  tofu_directory:
-    description: 'The directory where OpenTofu files are located'
-    required: true
-    default: '.'
-
 outputs:
   init:
     description: 'The result of the OpenTofu init command'
@@ -22,13 +16,11 @@ runs:
       uses: opentofu/setup-opentofu@v1
 
     - name: OpenTofu Init
-      working-directory: ${{ inputs.tofu_directory }}
       id: init
       run: tofu init 
       shell: bash
     
     - name: OpenTofu Validate
-      working-directory: ${{ inputs.tofu_directory }}
       id: validate
       run: tofu validate -no-color
       shell: bash
