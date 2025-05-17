@@ -20,13 +20,13 @@ outputs:
 
 runs:
   using: 'composite'
-  working-directory: ${{ inputs.tofu_directory }}
   steps:
 
     - name: Set Up Opentofu
       uses: opentofu/setup-opentofu@v1
 
     - name: OpenTofu Init
+      working-directory: ${{ inputs.tofu_directory }}
       id: init
       run: tofu init 
       shell: bash
@@ -38,6 +38,7 @@ runs:
       continue-on-error: true
 
     - name: OpenTofu PR Message
+      working-directory: ${{ inputs.tofu_directory }}
       uses: 'mshick/add-pr-comment@v2'
       if: ${{ steps.validate.outputs.stderr }}
       with :
@@ -62,6 +63,7 @@ runs:
           Errors detected in the OpenTofu plan step. Please check the logs for details.
     
     - name: OpenTofu Plan
+      working-directory: ${{ inputs.tofu_directory }}
       id: plan
       run: tofu plan -no-color
       shell: bash
@@ -98,5 +100,6 @@ runs:
         echo "Errors found in Validation Or Plan. Failing the job."
         echo ${{ steps.fmt.outputs.stderr }}
         exit 1
+      shell: bash
 
     

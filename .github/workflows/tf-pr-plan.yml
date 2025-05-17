@@ -46,7 +46,7 @@ jobs:
     - name: Conditionally Run if Formatting Issues Exist
       id: fmt_plan
       working-directory: ${{ env.TOFU_PATH }}
-      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }}
+      if: ${{ steps.fmt.outputs.tofu_fmt_count > 0 }}
       run: |
         echo "Formatting issues detected. Fixing..."
         FILES_CHANGED=$(tofu fmt -diff -recursive -no-color)
@@ -58,7 +58,7 @@ jobs:
       continue-on-error: true
     
     - name: Commit Formatting Fixes
-      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0  &&  !steps.fmt.outputs.stderr }}
+      if: ${{ steps.fmt.outputs.tofu_fmt_count > 0  &&  !steps.fmt.outputs.stderr }}
       id: fix_fmt
       uses: EndBug/add-and-commit@v9
       with:
