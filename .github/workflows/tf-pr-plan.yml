@@ -8,6 +8,8 @@ on:
       - 'modules/**'
       - 'helm/**'
 
+env:
+  TOFU_PATH: ./tofu
 
 jobs:
   setup:
@@ -28,18 +30,20 @@ jobs:
 
     - name: Check TofuFormatting 
       id: fmt
+      working-directory: ${{ env.TOFU_PATH }}
       run: |
-        OUTPUT=$(tofu fmt -check -recursive -no-color ./tofu | wc -l)
+        OUTPUT=$(tofu fmt -check -recursive -no-color | wc -l)
         echo "tofu_fmt_count=$OUTPUT" >> $GITHUB_ENV
       shell: bash
       continue-on-error: true
     
     - name: Conditionally Run if Formatting Issues Exist
       id: fmt_plan
+      working-directory: ${{ env.TOFU_PATH }}
       if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }}
       run: |
         echo "Formatting issues detected. Fixing..."
-        FILES_CHANGED=$(tofu fmt -diff -recursive -no-color ./tofu)
+        FILES_CHANGED=$(tofu fmt -diff -recursive -no-color)
         echo "tofu_fmt_list<<EOF" >> $GITHUB_ENV
         echo "$FILES_CHANGED" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
@@ -48,7 +52,7 @@ jobs:
       continue-on-error: true
     
     - name: Commit Formatting Fixes
-      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }} && ${{ toJson(steps.fmt.outputs.stderr) == '' }}
+      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }} && !${{ steps.fmt.outputs.stderr }}
       id: fix_fmt
       uses: EndBug/add-and-commit@v9
       with:
@@ -135,7 +139,7 @@ jobs:
     - name: 'Setup OpenTofu and Lint'
       id: tofu_plan_lint
       with:
-        tofu_directory: './tofu'
+        tofu_directory: ${{ env.TOFU_PATH }}
       uses: './.github/actions/tofu_plan_lint'
       env:
         TF_VAR_project: ${{ secrets.GCP_PROJECT_ID }}
