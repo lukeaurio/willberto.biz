@@ -32,6 +32,11 @@ jobs:
       id: fmt
       working-directory: ${{ env.TOFU_PATH }}
       run: |
+        # Check if wc is installed
+        if ! command -v wc &> /dev/null; then
+          echo "Error: wc command not found. This is required for formatting checks."
+          exit 1
+        fi
         export TF_OUTPUT=$(tofu fmt -check -recursive -no-color | wc -l)
         echo "tofu_fmt_count=$TF_OUTPUT"
         echo "tofu_fmt_count=$TF_OUTPUT" >> $GITHUB_ENV
@@ -53,7 +58,7 @@ jobs:
       continue-on-error: true
     
     - name: Commit Formatting Fixes
-      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }} && !${{ steps.fmt.outputs.stderr }}
+      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0  &&  !steps.fmt.outputs.stderr }}
       id: fix_fmt
       uses: EndBug/add-and-commit@v9
       with:
