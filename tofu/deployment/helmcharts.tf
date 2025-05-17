@@ -8,6 +8,7 @@ module "helm" {
   project                 = var.project_id
   region                  = var.region
   helm_chart_name         = each.value.name
+  helm_release_name       = each.value.name
   helm_repository_url     = each.value.repo_url
   helm_namespace          = each.value.namespace
   helm_chart_version      = each.value.version

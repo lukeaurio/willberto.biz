@@ -2,7 +2,6 @@ resource "random_password" "tunnel_secret" {
   length = 64
   lifecycle {
     create_before_destroy = true
-    replace_triggered_by  = [var.cloudflared_helm_variables]
   }
 }
 
