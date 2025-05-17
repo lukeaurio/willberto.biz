@@ -33,6 +33,7 @@ jobs:
       working-directory: ${{ env.TOFU_PATH }}
       run: |
         OUTPUT=$(tofu fmt -check -recursive -no-color | wc -l)
+        echo "tofu_fmt_count=$OUTPUT"
         echo "tofu_fmt_count=$OUTPUT" >> $GITHUB_ENV
       shell: bash
       continue-on-error: true
