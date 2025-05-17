@@ -46,7 +46,7 @@ jobs:
     - name: debug
       run: |
         echo "tofu_fmt_count: ${{ steps.fmt.outputs.tofu_fmt_count }}"
-        echgo "${{ steps.fmt.outputs.tofu_fmt_count > 0 }}"
+        echo "${{ steps.fmt.outputs.tofu_fmt_count > 0 }}"
         echo "stderr: ${{ steps.fmt.outputs.stderr }}"
       shell: bash
     
