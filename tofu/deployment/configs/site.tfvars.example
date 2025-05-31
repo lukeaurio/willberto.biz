@@ -1,0 +1,14 @@
+# GCP Project Configuration
+project_id = "your-gcp-project-id"
+
+# GCP Region - must be one of: us-central1, us-east1, us-east4, us-west1, us-west2, us-west3, us-west4
+region = "us-central1"
+
+# GCP Zone - must be one of the valid US zones
+zone = "us-central1-a"
+
+# GCS bucket to store Terraform state files
+tfstates_bucket = "your-tfstate-bucket-name"
+
+# Cloudflare API Token for DNS management
+cloudflare_api_token = "your-cloudflare-api-token"
