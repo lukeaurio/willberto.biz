@@ -6,6 +6,8 @@ inputs:
     description: 'The directory where OpenTofu files are located'
     required: true
     default: '.'
+  # Note: Sensitive values should be passed via environment variables, not inputs
+  # bucket_name is accessed via env.BUCKET_NAME instead
 
 outputs:
   init:
@@ -24,9 +26,10 @@ runs:
     - name: OpenTofu Init
       id: init
       working-directory: ${{ inputs.tofu_directory }}
-      run: tofu init -input=false -no-color
+      run: tofu init backend-config="bucket=${{ env.TF_VAR_tfstates_bucket }}" -input=false -no-color
       shell: bash
-    
+      continue-on-error: true # This allows the workflow to continue even if init fails
+
     - name: OpenTofu Validate
       id: validate
       working-directory: ${{ inputs.tofu_directory }}
@@ -36,23 +39,34 @@ runs:
 
     - name: OpenTofu PR Message
       uses: 'mshick/add-pr-comment@v2'
-      if: ${{ steps.validate.outputs.stderr }}
+      if: ${{ steps.validate.outputs.stderr }} || ${{ steps.init.outputs.stderr}}
       with:
         refresh-message-position: true
         message-id: ${{ github.event.pull_request.id }}-VALIDATE
         message: |
           ### ⚠️ OpenTofu Validation Failed 🛠️
           There's some issues, homeboy!. Click below to view the details:
-          <details>
-          <summary>🔍 View OpenTofu Validate Output</summary>
+            <details>
+            <summary>🔍 View OpenTofu Init Output</summary>
 
-          ```
-          ${{ steps.validate.outputs.stdout }}
-          ```
+            ```
+            ${{ steps.init.outputs.stdout }}
+            ```
 
-          </details>
-          
-          ${{ steps.validate.outputs.stderr && format('<details>\n<summary>🔍 View OpenTofu Stderr </summary>\n\n```\n{0}\n```\n\n</details>', steps.validate.outputs.stderr) }}
+            </details>
+            
+            ${{ steps.init.outputs.stderr && format('<details>\n<summary>🔍 View OpenTofu Init Stderr</summary>\n\n```\n{0}\n```\n\n</details>', steps.init.outputs.stderr) }}
+
+            <details>
+            <summary>🔍 View OpenTofu Validate Output</summary>
+
+            ```
+            ${{ steps.validate.outputs.stdout }}
+            ```
+
+            </details>
+            
+            ${{ steps.validate.outputs.stderr && format('<details>\n<summary>🔍 View OpenTofu Validate Stderr</summary>\n\n```\n{0}\n```\n\n</details>', steps.validate.outputs.stderr) }}
 
           Keep trying, Kiddo! 🚀
         message-failure: |

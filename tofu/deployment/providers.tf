@@ -29,8 +29,8 @@ terraform {
   #  path = "configs/willbertobiz.tfstate"
   #}
   backend "gcs" {
-    bucket = var.tfstates_bucket #<your Bucket here!>
-    prefix = "willberto_site"    #<Make this whatever hugh like!>
+    #bucket = Use the bucket name from a backend.tfvars file or pass it in with an environment variable like in .github/actions/tofu_plan_lint/action.yml
+    prefix = var.tfstates_prefix    #<Make this whatever hugh like!>
   }
 }
 
