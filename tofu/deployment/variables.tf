@@ -26,13 +26,6 @@ variable "zone" {
   }
 }
 
-variable "tfstates_prefix" {
-  description = "The GCS bucket to store the Terraform state files"
-  type        = string
-  sensitive   = true
-  default     = "willberto_site"
-}
-
 # Cloudflare Configuration
 variable "cloudflare_api_token" {
   description = "The Cloudflare API Token"

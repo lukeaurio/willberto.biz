@@ -157,6 +157,7 @@ jobs:
       env:
         TF_VAR_project: ${{ secrets.GCP_PROJECT_ID }}
         TF_VAR_region: ${{ vars.GCP_REGION }}
-        TF_VAR_zone: ${{ vars.GCP_ZONE }}
-        TF_VAR_tfstates_bucket: ${{ secrets.TFSTATE_BUCKET }}
+        TF_VAR_zone: ${{ vars.GCP_ZONE }} 
         TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+        tfstates_bucket: ${{ secrets.TFSTATE_BUCKET }}
+        tfstates_prefix: ${{ secrets.TFSTATE_PREFIX }}
