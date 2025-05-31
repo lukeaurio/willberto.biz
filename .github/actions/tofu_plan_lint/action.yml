@@ -24,7 +24,7 @@ runs:
     - name: OpenTofu Init
       working-directory: ${{ inputs.tofu_directory }}
       id: init
-      run: tofu init 
+      run: tofu init ${{ inputs.tofu_directory }} -no-color
       shell: bash
     
     - name: OpenTofu Validate
