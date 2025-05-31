@@ -30,7 +30,7 @@ terraform {
   #}
   backend "gcs" {
     #bucket = Use the bucket name from a backend.tfvars file or pass it in with an environment variable like in .github/actions/tofu_plan_lint/action.yml
-    prefix = var.tfstates_prefix    #<Make this whatever hugh like!>
+    prefix = var.tfstates_prefix #<Make this whatever hugh like!>
   }
 }
 
