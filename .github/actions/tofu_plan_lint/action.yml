@@ -33,7 +33,7 @@ runs:
     - name: OpenTofu Validate
       id: validate
       working-directory: ${{ inputs.tofu_directory }}
-      run: tofu validate -input=false -no-color
+      run: tofu validate -no-color
       shell: bash
       continue-on-error: true
 
@@ -46,36 +46,21 @@ runs:
         message: |
           ### ⚠️ OpenTofu Validation Failed 🛠️
           There's some issues, homeboy!. Click below to view the details:
-            <details>
-            <summary>🔍 View OpenTofu Init Output</summary>
+          ${{ steps.init.outputs.stdout && format('<details>\n<summary>🔍 View OpenTofu Init Output</summary>\n\n```\n{0}\n```\n\n</details>', steps.init.outputs.stdout) }}
 
-            ```
-            ${{ steps.init.outputs.stdout }}
-            ```
+          ${{ steps.init.outputs.stderr && format('<details>\n<summary>🔍 View OpenTofu Init Stderr</summary>\n\n```\n{0}\n```\n\n</details>', steps.init.outputs.stderr) }}
 
-            </details>
-            
-            ${{ steps.init.outputs.stderr && format('<details>\n<summary>🔍 View OpenTofu Init Stderr</summary>\n\n```\n{0}\n```\n\n</details>', steps.init.outputs.stderr) }}
+          ${{ steps.validate.outputs.stdout && format('<details>\n<summary>🔍 View OpenTofu Validate Output</summary>\n\n```\n{0}\n```\n\n</details>', steps.validate.outputs.stdout) }}
 
-            <details>
-            <summary>🔍 View OpenTofu Validate Output</summary>
-
-            ```
-            ${{ steps.validate.outputs.stdout }}
-            ```
-
-            </details>
-            
-            ${{ steps.validate.outputs.stderr && format('<details>\n<summary>🔍 View OpenTofu Validate Stderr</summary>\n\n```\n{0}\n```\n\n</details>', steps.validate.outputs.stderr) }}
+          ${{ steps.validate.outputs.stderr && format('<details>\n<summary>🔍 View OpenTofu Validate Stderr</summary>\n\n```\n{0}\n```\n\n</details>', steps.validate.outputs.stderr) }}
 
           Keep trying, Kiddo! 🚀
         message-failure: |
           Errors detected in the OpenTofu plan step. Please check the logs for details.
-    
     - name: OpenTofu Plan
       working-directory: ${{ inputs.tofu_directory }}
       id: plan
-      run: tofu plan -input=false -lock=false -no-color
+      run: tofu plan -lock=false -no-color
       shell: bash
       continue-on-error: true
 
