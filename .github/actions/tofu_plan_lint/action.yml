@@ -46,11 +46,8 @@ runs:
         message: |
           ### ⚠️ OpenTofu Validation Failed 🛠️
           There's some issues, homeboy!. Click below to view the details:
-          ${{ steps.init.outputs.stdout && format('<details>\n<summary>🔍 View OpenTofu Init Output</summary>\n\n```\n{0}\n```\n\n</details>', steps.init.outputs.stdout) }}
 
           ${{ steps.init.outputs.stderr && format('<details>\n<summary>🔍 View OpenTofu Init Stderr</summary>\n\n```\n{0}\n```\n\n</details>', steps.init.outputs.stderr) }}
-
-          ${{ steps.validate.outputs.stdout && format('<details>\n<summary>🔍 View OpenTofu Validate Output</summary>\n\n```\n{0}\n```\n\n</details>', steps.validate.outputs.stdout) }}
 
           ${{ steps.validate.outputs.stderr && format('<details>\n<summary>🔍 View OpenTofu Validate Stderr</summary>\n\n```\n{0}\n```\n\n</details>', steps.validate.outputs.stderr) }}
 
