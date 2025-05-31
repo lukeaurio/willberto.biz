@@ -22,15 +22,15 @@ runs:
       uses: opentofu/setup-opentofu@v1
 
     - name: OpenTofu Init
-      working-directory: ${{ inputs.tofu_directory }}
       id: init
-      run: tofu init ${{ inputs.tofu_directory }} -no-color
+      working-directory: ${{ inputs.tofu_directory }}
+      run: tofu init -input=false -no-color
       shell: bash
     
     - name: OpenTofu Validate
-      working-directory: ${{ inputs.tofu_directory }}
       id: validate
-      run: tofu validate -no-color
+      working-directory: ${{ inputs.tofu_directory }}
+      run: tofu validate -input=false -no-color
       shell: bash
       continue-on-error: true
 
@@ -61,7 +61,7 @@ runs:
     - name: OpenTofu Plan
       working-directory: ${{ inputs.tofu_directory }}
       id: plan
-      run: tofu plan -no-color
+      run: tofu plan -lock=false -no-color
       shell: bash
       continue-on-error: true
 
