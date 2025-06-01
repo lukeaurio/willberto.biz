@@ -10,12 +10,24 @@ inputs:
   # bucket_name is accessed via env.BUCKET_NAME instead
 
 outputs:
-  init:
+  init_stdout:
     description: 'The result of the OpenTofu init command'
     value: ${{ steps.init.outputs.stdout }}
-  validate:
+  init_stderr:
+    description: 'The stderr of the OpenTofu init command'
+    value: ${{ steps.init.outputs.stderr }}
+  validate_stdout:
     description: 'The result of the OpenTofu validate command'
     value: ${{ steps.validate.outputs.stdout }}
+  validate_stderr:
+    description: 'The stderr of the OpenTofu validate command'
+    value: ${{ steps.validate.outputs.stderr }}
+  plan_stdout:
+    description: 'The result of the OpenTofu plan command'
+    value: ${{ steps.plan.outputs.stdout }}
+  plan_stderr:
+    description: 'The stderr of the OpenTofu plan command'
+    value: ${{ steps.plan.outputs.stderr }}
 
 runs:
   using: 'composite'
@@ -37,55 +49,15 @@ runs:
       shell: bash
       continue-on-error: true
 
-    - name: OpenTofu PR Message
-      uses: 'mshick/add-pr-comment@v2'
-      if: ${{ steps.validate.outputs.stderr }} || ${{ steps.init.outputs.stderr}}
-      with:
-        refresh-message-position: true
-        message-id: ${{ github.event.pull_request.id }}-VALIDATE
-        message: |
-          ### ⚠️ OpenTofu Validation Failed 🛠️
-          There's some issues, homeboy!. Click below to view the details:
-
-          ${{ steps.init.outputs.stderr && format('<details>\n<summary>🔍 View OpenTofu Init Stderr</summary>\n\n```\n{0}\n```\n\n</details>', steps.init.outputs.stderr) }}
-
-          ${{ steps.validate.outputs.stderr && format('<details>\n<summary>🔍 View OpenTofu Validate Stderr</summary>\n\n```\n{0}\n```\n\n</details>', steps.validate.outputs.stderr) }}
-
-          Keep trying, Kiddo! 🚀
-        message-failure: |
-          Errors detected in the OpenTofu plan step. Please check the logs for details.
     - name: OpenTofu Plan
       working-directory: ${{ inputs.tofu_directory }}
       id: plan
       run: tofu plan -lock=false -no-color
       shell: bash
       continue-on-error: true
-
-    - name: OpenTofu PR Message
-      uses: 'mshick/add-pr-comment@v2'
-      with:
-        refresh-message-position: true
-        message-id: ${{ github.event.pull_request.id }}-PLAN
-        message: |
-          ### 🚀 OpenTofu Plan Output
-          The OpenTofu plan has been successfully generated. Click below to view the details:
-          <details>
-          <summary>🔍 View OpenTofu Plan</summary>
-
-          ```
-          ${{ steps.plan.outputs.stdout }}
-          ```
-
-          </details>
-
-          ${{ steps.plan.outputs.stderr && format('<details>\n  <summary>🔍 View OpenTofu Plan Stderr</summary>\n\n  ```\n  {0}\n  ```\n\n</details>', steps.plan.outputs.stderr) }}
-
-          Deploy when it;s good, Kiddo! 🚀
-        message-failure: |
-          Errors detected in the OpenTofu plan step. Please check the logs for details.
     
     - name: Potential Failure        
-      if: ${{ steps.validate.outputs.stderr || steps.plan.outputs.stderr }}
+      if: ${{ steps.init.outputs.stderr || steps.validate.outputs.stderr || steps.plan.outputs.stderr }}
       run: |
         echo "Errors found in Validation Or Plan. Failing the job."
         echo ${{ steps.validate.outputs.stderr || steps.plan.outputs.stderr }}

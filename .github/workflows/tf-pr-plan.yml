@@ -161,3 +161,28 @@ jobs:
         TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
         tfstates_bucket: ${{ secrets.TFSTATE_BUCKET }}
         tfstates_prefix: ${{ secrets.TFSTATE_PREFIX }}
+
+    - name: PR Comment (OpenTofu Plan)
+      uses: 'mshick/add-pr-comment@v2'
+      if: always()
+      with:
+        message-id: ${{ github.event.pull_request.id }}-TOFU-PLAN
+        message: |
+          ### 🚀 OpenTofu Plan Output
+          The OpenTofu plan has been successfully generated.
+          
+          ${{ steps.tofu_plan_lint.outputs.plan_stdout && format('<details>\n<summary>🔍 View Plan Output</summary>\n\n```\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.plan_stdout) }}
+          
+          ${{ steps.tofu_plan_lint.outputs.plan_stderr && format('<details>\n<summary>⚠️ Plan Errors</summary>\n\n```\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.plan_stderr) }}
+      
+    - name: PR Comment (OpenTofu Errors)
+      uses: 'mshick/add-pr-comment@v2'  
+      if: ${{ steps.tofu_plan_lint.outputs.init_stderr || steps.tofu_plan_lint.outputs.validate_stderr }}
+      with:
+        message-id: ${{ github.event.pull_request.id }}-TOFU-ERROR
+        message: |
+          ### ⚠️ OpenTofu Validation Failed 🛠️
+          
+          ${{ steps.tofu_plan_lint.outputs.init_stderr && format('<details>\n<summary>🔍 Init Errors</summary>\n\n```\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.init_stderr) }}
+          
+          ${{ steps.tofu_plan_lint.outputs.validate_stderr && format('<details>\n<summary>🔍 Validation Errors</summary>\n\n```\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.validate_stderr) }}
