@@ -3,7 +3,7 @@ variable "kubernetes_cluster_name" {
   type        = string
 }
 
-variable "project" {
+variable "project_id" {
   description = "The Google Cloud Platform (GCP) project ID where the resources will be created"
   type        = string
 }
