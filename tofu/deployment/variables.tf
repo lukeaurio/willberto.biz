@@ -6,6 +6,12 @@ variable "project_id" {
   sensitive   = true
 }
 
+variable "project_name" {
+  description = "The GCP Project Name"
+  type        = string
+  sensitive   = true
+}
+
 variable "region" {
   description = "The region for the GCP resources"
   type        = string
