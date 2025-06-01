@@ -155,7 +155,7 @@ jobs:
         tofu_directory: ${{ env.TOFU_PATH }}/deployment
       uses: './.github/actions/tofu_plan_lint'
       env:
-        TF_VAR_project: ${{ secrets.GCP_PROJECT_ID }}
+        TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
         TF_VAR_region: ${{ vars.GCP_REGION }}
         TF_VAR_zone: ${{ vars.GCP_ZONE }} 
         TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
