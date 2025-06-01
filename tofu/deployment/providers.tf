@@ -1,6 +1,7 @@
 provider "google" {
   project                         = var.project_id
   region                          = var.region
+  zone                            = var.zone
   add_terraform_attribution_label = true
 }
 
@@ -28,8 +29,8 @@ terraform {
   #  path = "configs/willbertobiz.tfstate"
   #}
   backend "gcs" {
-    bucket = var.tfstates_bucket #<your Bucket here!>
-    prefix = "willberto_site"    #<Make this whatever hugh like!>
+    #bucket = Use the bucket name from a backend.tfvars file or pass it in with an environment variable like in .github/actions/tofu_plan_lint/action.yml
+    #prefix = #Make this whatever hugh like! but like above you need to pass it in with an environment variable or a backend.tfvars file
   }
 }
 
@@ -48,11 +49,13 @@ data "google_container_cluster" "my_cluster" {
   location = var.region
 }
 
-# We're configuring the Helm provider in the module definition, Mostly because we're writing this in a way that we can build multiple clusters with the same module
+data "google_client_config" "current" {} # Gotta define this for the use of the Helm and Kubernetes providers
+
+# We're configuring the Helm provider to use the GKE cluster we just made
 provider "helm" {
   kubernetes {
     host  = "https://${data.google_container_cluster.my_cluster.endpoint}"
-    token = data.google_client_config.provider.access_token
+    token = data.google_client_config.current.access_token
     cluster_ca_certificate = base64decode(
       data.google_container_cluster.my_cluster.master_auth[0].cluster_ca_certificate,
     )
