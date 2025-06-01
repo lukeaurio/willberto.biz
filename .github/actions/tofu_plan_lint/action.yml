@@ -12,22 +12,22 @@ inputs:
 outputs:
   init_stdout:
     description: 'The result of the OpenTofu init command'
-    value: ${{ steps.init.outputs.stdout }}
+    value: ${{ steps.init.outputs.stdout || '' }}
   init_stderr:
     description: 'The stderr of the OpenTofu init command'
-    value: ${{ steps.init.outputs.stderr }}
+    value: ${{ steps.init.outputs.stderr || '' }}
   validate_stdout:
     description: 'The result of the OpenTofu validate command'
-    value: ${{ steps.validate.outputs.stdout }}
+    value: ${{ steps.validate.outputs.stdout || '' }}
   validate_stderr:
     description: 'The stderr of the OpenTofu validate command'
-    value: ${{ steps.validate.outputs.stderr }}
+    value: ${{ steps.validate.outputs.stderr || '' }}
   plan_stdout:
     description: 'The result of the OpenTofu plan command'
-    value: ${{ steps.plan.outputs.stdout }}
+    value: ${{ steps.plan.outputs.stdout || '' }}
   plan_stderr:
     description: 'The stderr of the OpenTofu plan command'
-    value: ${{ steps.plan.outputs.stderr }}
+    value: ${{ steps.plan.outputs.stderr || '' }}
 
 runs:
   using: 'composite'
