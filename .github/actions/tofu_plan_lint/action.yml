@@ -26,9 +26,6 @@ outputs:
   plan_stderr:
     description: 'The stderr of the OpenTofu plan command'
     value: ${{ steps.plan.outputs.stderr || '' }}
-  plan_json:
-    description: 'The OpenTofu plan in JSON format'
-    value: ${{ steps.plan_json.outputs.json_output || '' }}
   plan_summary:
     description: 'Summary of plan changes'
     value: ${{ steps.parse_plan.outputs.summary || '' }}
@@ -38,6 +35,11 @@ runs:
   steps:
     - name: Set Up Opentofu
       uses: opentofu/setup-opentofu@v1
+
+    - name: Install tftools
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/tftools/main/scripts/install.sh | bash
+      shell: bash
 
     - name: OpenTofu Init
       id: init
@@ -59,32 +61,13 @@ runs:
       run: tofu plan -input=false -lock=false -concise -no-color -out=./plan.tfplan
       shell: bash
       continue-on-error: true
-
-    - uses: kishaningithub/setup-tf-summarize@v1
-    
-    - name: Convert Plan to JSON
-      working-directory: ${{ inputs.tofu_directory }}
-      id: plan_json
-      run: |
-        if [ -f "plan.tfplan" ]; then
-          echo "Got Here"
-          JSON_OUTPUT=$(tofu show -json ./plan.tfplan | tf-summarize )
-          echo "json_output<<EOF" >> $GITHUB_OUTPUT
-          echo "$JSON_OUTPUT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          echo "json=$JSON_OUTPUT"
-        else
-          echo "json_output=Error: No Plan File Generated" >> $GITHUB_OUTPUT
-        fi
-      shell: bash
-      continue-on-error: true
     
     - name: Parse Plan Summary
       working-directory: ${{ inputs.tofu_directory }}
       id: parse_plan
       run: |
         if [ -f "plan.tfplan" ]; then
-          SUMMARY=$(tofu show plan.tfplan | head -20)
+          SUMMARY=$(tofu show -json plan.tfplan | tftools summarize --show-tags --show-unchanged --compact)
           echo "summary<<EOF" >> $GITHUB_OUTPUT
           echo "$SUMMARY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
