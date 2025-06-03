@@ -28,7 +28,7 @@ outputs:
     value: ${{ steps.plan.outputs.stderr || '' }}
   plan_json:
     description: 'The OpenTofu plan in JSON format'
-    value: ${{ steps.plan_json.outputs.json || '' }}
+    value: ${{ steps.plan_json.outputs.json_output || '' }}
   plan_summary:
     description: 'Summary of plan changes'
     value: ${{ steps.parse_plan.outputs.summary || '' }}
