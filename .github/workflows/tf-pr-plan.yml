@@ -172,9 +172,9 @@ jobs:
           ### 🚀 OpenTofu Plan Output
           The OpenTofu plan has been successfully generated.
           
-          ${{ steps.tofu_plan_lint.outputs.plan_stdout && format('<details>\n<summary>🔍 View Plan Output</summary>\n\n```\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.plan_stdout) }}
-          
-          ${{ steps.tofu_plan_lint.outputs.plan_stderr && format('<details>\n<summary>⚠️ Plan Errors</summary>\n\n```\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.plan_stderr) }}
+            ${{ steps.tofu_plan_lint.outputs.plan_summary && format('<details>\n<summary>🔍 View Plan Summary</summary>\n\n```\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.plan_summary) }}
+            
+            ${{ steps.tofu_plan_lint.outputs.plan_json && format('<details>\n<summary>📊 View Plan JSON</summary>\n\n```json\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.plan_json) }}
       
     - name: PR Comment (OpenTofu Errors)
       uses: 'mshick/add-pr-comment@v2'  
