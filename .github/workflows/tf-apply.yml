@@ -6,6 +6,16 @@ on:
 
   workflow_dispatch:
 
+env:
+  TOFU_PATH: ./tofu
+  TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+  TF_VAR_project_name: ${{ secrets.GCP_PROJECT_NAME }}
+  TF_VAR_region: ${{ vars.GCP_REGION }}
+  TF_VAR_zone: ${{ vars.GCP_ZONE }} 
+  TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+  tfstates_bucket: ${{ secrets.TFSTATE_BUCKET }}
+  tfstates_prefix: ${{ secrets.TFSTATE_PREFIX }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,3 +34,15 @@ jobs:
         gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
         gcp_workload_pool: ${{ secrets.GCP_WORKLOAD_POOL }}
         gcp_workload_provider: ${{ secrets.GCP_WORKLOAD_PROVIDER }}
+    
+    - name: OpenTofu Init
+      id: init
+      working-directory: ${{ env.TOFU_PATH }}/deployment
+      run: tofu init -backend-config="bucket=${{ env.tfstates_bucket }}" -backend-config="prefix=${{ env.tfstates_prefix }}" -input=false -no-color
+      shell: bash
+      
+    - name: OpenTofu Apply
+      id: apply
+      working-directory: ${{ env.TOFU_PATH }}/deployment
+      run: tofu apply -auto-approve -no-color
+      shell: bash

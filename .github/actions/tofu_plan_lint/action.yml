@@ -72,7 +72,7 @@ runs:
           echo "json_output<<EOF" >> $GITHUB_OUTPUT
           echo "$JSON_OUTPUT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-          echo "json=json_output"
+          echo "json=$JSON_OUTPUT"
         else
           echo "json_output=Error: No Plan File Generated" >> $GITHUB_OUTPUT
         fi
