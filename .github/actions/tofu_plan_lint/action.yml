@@ -56,7 +56,7 @@ runs:
     - name: OpenTofu Plan
       working-directory: ${{ inputs.tofu_directory }}
       id: plan
-      run: tofu plan -input=false -lock=false -no-color -out=plan.tfplan
+      run: tofu plan -input=false -lock=false -concise -no-color -out=./plan.tfplan
       shell: bash
       continue-on-error: true
     
@@ -65,12 +65,12 @@ runs:
       id: plan_json
       run: |
         if [ -f "plan.tfplan" ]; then
-          JSON_OUTPUT=$(tofu show -json plan.tfplan)
-          echo "json<<EOF" >> $GITHUB_OUTPUT
+          JSON_OUTPUT=$(tofu show -json ./plan.tfplan)
+          echo "json_output<<EOF" >> $GITHUB_OUTPUT
           echo "$JSON_OUTPUT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
         else
-          echo "json=" >> $GITHUB_OUTPUT
+          echo "json=json_output" >> $GITHUB_OUTPUT
         fi
       shell: bash
       continue-on-error: true
