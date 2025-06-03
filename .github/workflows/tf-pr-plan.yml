@@ -133,7 +133,8 @@ jobs:
     needs: setup
     permissions:
       id-token: write
-      contents: read
+      contents: write
+      pull-requests: write
     if: ${{ needs.setup.outputs.fmt == 0 }} && ${{ false }}
     steps:
     - name: 'Checkout code'
