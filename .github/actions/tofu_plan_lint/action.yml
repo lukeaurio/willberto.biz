@@ -59,18 +59,22 @@ runs:
       run: tofu plan -input=false -lock=false -concise -no-color -out=./plan.tfplan
       shell: bash
       continue-on-error: true
+
+    - uses: kishaningithub/setup-tf-summarize@v1
     
     - name: Convert Plan to JSON
       working-directory: ${{ inputs.tofu_directory }}
       id: plan_json
       run: |
         if [ -f "plan.tfplan" ]; then
-          JSON_OUTPUT=$(tofu show -json ./plan.tfplan)
+          echo "Got Here"
+          JSON_OUTPUT=$(tofu show -json ./plan.tfplan | tf-summarize )
           echo "json_output<<EOF" >> $GITHUB_OUTPUT
           echo "$JSON_OUTPUT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+          echo "json=json_output"
         else
-          echo "json=json_output" >> $GITHUB_OUTPUT
+          echo "json_output=Error: No Plan File Generated" >> $GITHUB_OUTPUT
         fi
       shell: bash
       continue-on-error: true
