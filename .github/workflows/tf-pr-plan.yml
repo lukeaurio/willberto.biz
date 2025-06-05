@@ -168,6 +168,7 @@ jobs:
       uses: 'mshick/add-pr-comment@v2'
       if: always()
       with:
+        refresh-message-position: true
         message-id: ${{ github.event.pull_request.id }}-TOFU-PLAN
         message: |
           ### 🚀 OpenTofu Plan Output
@@ -179,6 +180,7 @@ jobs:
       uses: 'mshick/add-pr-comment@v2'  
       if: ${{ steps.tofu_plan_lint.outputs.init_stderr || steps.tofu_plan_lint.outputs.validate_stderr }}
       with:
+        refresh-message-position: true
         message-id: ${{ github.event.pull_request.id }}-TOFU-ERROR
         message: |
           ### ⚠️ OpenTofu Validation Failed 🛠️
