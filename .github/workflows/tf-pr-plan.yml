@@ -172,28 +172,19 @@ jobs:
         message-id: ${{ github.event.pull_request.id }}-TOFU-PLAN
         message: |
           ### 🚀 OpenTofu Plan Output
+          The OpenTofu plan has been successfully generated.
           
-          ${{ steps.tofu_plan_lint.outputs.plan_summary && format('#### 📊 Plan Summary\n\n<details>\n<summary>🔍 View Detailed Plan Output</summary>\n\n{0}\n\n</details>', steps.tofu_plan_lint.outputs.plan_summary) || '**No plan changes detected** ✅' }}
-          
-          ${{ steps.tofu_plan_lint.outputs.plan_stdout && format('\n<details>\n<summary>📋 Raw Plan Output</summary>\n\n```terraform\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.plan_stdout) }}
-          
-          ---
-          *🤖 This comment will be automatically updated when the plan changes*
+          ${{ steps.tofu_plan_lint.outputs.plan_summary && format('<details>\n<summary>🔍 View Plan Summary</summary>\n\n```markdown\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.plan_summary) }}
                 
     - name: PR Comment (OpenTofu Errors)
       uses: 'mshick/add-pr-comment@v2'  
-      if: ${{ steps.tofu_plan_lint.outputs.init_stderr || steps.tofu_plan_lint.outputs.validate_stderr || steps.tofu_plan_lint.outputs.plan_stderr }}
+      if: ${{ steps.tofu_plan_lint.outputs.init_stderr || steps.tofu_plan_lint.outputs.validate_stderr }}
       with:
         refresh-message-position: true
         message-id: ${{ github.event.pull_request.id }}-TOFU-ERROR
         message: |
-          ### ⚠️ OpenTofu Errors Detected! 🛠️
+          ### ⚠️ OpenTofu Validation Failed 🛠️
           
           ${{ steps.tofu_plan_lint.outputs.init_stderr && format('<details>\n<summary>🔍 Init Errors</summary>\n\n```bash\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.init_stderr) }}
           
           ${{ steps.tofu_plan_lint.outputs.validate_stderr && format('<details>\n<summary>🔍 Validation Errors</summary>\n\n```bash\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.validate_stderr) }}
-          
-          ${{ steps.tofu_plan_lint.outputs.plan_stderr && format('<details>\n<summary>🔍 Plan Errors</summary>\n\n```bash\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.plan_stderr) }}
-          
-          ---
-          *Please fix these errors before proceeding* 🔧
