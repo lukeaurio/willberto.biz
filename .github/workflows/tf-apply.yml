@@ -1,10 +1,8 @@
 name: Deploy code to GCP
 
 on:
-  #push:
-  #  branches: [ "main" ]
-
-  workflow_dispatch:
+  push:
+    branches: [ "main" ]
 
 env:
   TOFU_PATH: ./tofu
@@ -30,7 +28,7 @@ jobs:
 
     - name: Set Up Opentofu
       uses: opentofu/setup-opentofu@v1
-      
+
     - name: 'Authenticate with GCP'
       uses: './.github/actions/auth_to_gcp'
       with:
