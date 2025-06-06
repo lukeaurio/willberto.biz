@@ -28,6 +28,9 @@ jobs:
     - name: 'Checkout code'
       uses: 'actions/checkout@v4'
 
+    - name: Set Up Opentofu
+      uses: opentofu/setup-opentofu@v1
+      
     - name: 'Authenticate with GCP'
       uses: './.github/actions/auth_to_gcp'
       with:
