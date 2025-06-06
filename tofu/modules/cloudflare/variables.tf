@@ -58,4 +58,15 @@ variable "cloudflared_helm_variables" {
     project                 = string
     region                  = string
   })
+  default = {
+    service_name            = "cloudflared"
+    helm_chart_name         = "cloudflared"
+    helm_repository_url     = "https://cloudflare.github.io/cloudflared/"
+    helm_chart_version      = "latest"
+    helm_value_file         = ""
+    replica_count           = 1
+    kubernetes_cluster_name = "default"
+    project                 = "default"
+    region                  = "us-central1"
+  }
 }

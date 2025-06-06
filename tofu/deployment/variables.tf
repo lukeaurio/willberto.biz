@@ -6,6 +6,12 @@ variable "project_id" {
   sensitive   = true
 }
 
+variable "project_name" {
+  description = "The GCP Project Name"
+  type        = string
+  sensitive   = true
+}
+
 variable "region" {
   description = "The region for the GCP resources"
   type        = string
@@ -16,10 +22,14 @@ variable "region" {
   }
 }
 
-variable "tfstates_bucket" {
-  description = "The GCS bucket to store the Terraform state files"
+variable "zone" {
+  description = "The zone for the GCP resources"
   type        = string
   sensitive   = true
+  validation {
+    condition     = contains(["us-central1-a", "us-central1-b", "us-central1-c", "us-central1-f", "us-east1-b", "us-east1-c", "us-east1-d", "us-east4-a", "us-west1-a", "us-west1-b", "us-west2-a", "us-west2-b", "us-west3-a", "us-west3-b", "us-west4-a"], var.zone)
+    error_message = "The zone must be one of the US zones: us-central1-a, us-central1-b, us-central1-c, us-central1-f, us-east1-b, us-east1-c, us-east1-d, us-east4-a, us-west1-a, us-west1-b, us-west2-a, us-west2-b, us-west3-a, us-west3-b, us-west4-a."
+  }
 }
 
 # Cloudflare Configuration
@@ -32,7 +42,8 @@ variable "cloudflare_api_token" {
 # Google Cloud Storage Buckets Configuration
 variable "buckets" {
   description = "Map of GCS buckets to create"
-  type = map(object({
+  type = list(object({
+    name                        = string
     storage_class               = string
     public_access_prevention    = string
     uniform_bucket_level_access = bool
@@ -42,13 +53,13 @@ variable "buckets" {
       type = string
     }))
   }))
-  default = {}
+  default = []
 }
 
 # Helm Releases Configuration
 variable "helm_releases" {
   description = "Map of Helm releases to deploy"
-  type = map(object({
+  type = list(object({
     name          = string
     namespace     = string
     repo_url      = string
@@ -58,16 +69,5 @@ variable "helm_releases" {
     values_file   = optional(string)
     replica_count = number
   }))
-  default = {
-    example_release = {
-      name          = ""
-      namespace     = ""
-      repo_url      = ""
-      chart         = ""
-      version       = ""
-      values        = ""
-      values_file   = ""
-      replica_count = 1
-    }
-  }
+  default = []
 }

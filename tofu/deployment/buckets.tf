@@ -1,7 +1,7 @@
 module "google_storage_bucket" {
   source = "../modules/google/bucket"
 
-  for_each = var.buckets
+  for_each = { for k, v in var.buckets : v.name => v }
 
   name                        = each.key
   location                    = var.region

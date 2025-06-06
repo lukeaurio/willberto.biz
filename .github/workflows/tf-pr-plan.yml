@@ -8,6 +8,8 @@ on:
       - 'modules/**'
       - 'helm/**'
 
+env:
+  TOFU_PATH: ./tofu
 
 jobs:
   setup:
@@ -28,27 +30,42 @@ jobs:
 
     - name: Check TofuFormatting 
       id: fmt
+      working-directory: ${{ env.TOFU_PATH }}
       run: |
-        OUTPUT=$(tofu fmt -check -recursive -no-color ./tofu | wc -l)
-        echo "tofu_fmt_count=$OUTPUT" >> $GITHUB_ENV
+        # Check if wc is installed
+        if ! command -v wc &> /dev/null; then
+          echo "Error: wc command not found. This is required for formatting checks."
+          exit 1
+        fi
+        export TF_OUTPUT=$(tofu fmt -check -recursive -no-color | wc -l)
+        echo "tofu_fmt_count=$TF_OUTPUT"
+        echo "tofu_fmt_count=$TF_OUTPUT" >> $GITHUB_OUTPUT
       shell: bash
       continue-on-error: true
+
+    #- name: debug
+    #  run: |
+    #    echo "tofu_fmt_count: ${{ steps.fmt.outputs.tofu_fmt_count }}"
+    #    echo "${{ steps.fmt.outputs.tofu_fmt_count > 0 }}"
+    #    echo "stderr: ${{ steps.fmt.outputs.stderr }}"
+    #  shell: bash
     
     - name: Conditionally Run if Formatting Issues Exist
       id: fmt_plan
-      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }}
+      working-directory: ${{ env.TOFU_PATH }}
+      if: ${{ steps.fmt.outputs.tofu_fmt_count > 0 }}
       run: |
         echo "Formatting issues detected. Fixing..."
-        FILES_CHANGED=$(tofu fmt -diff -recursive -no-color ./tofu)
-        echo "tofu_fmt_list<<EOF" >> $GITHUB_ENV
-        echo "$FILES_CHANGED" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
+        FILES_CHANGED=$(tofu fmt -diff -recursive -no-color)
+        echo "tofu_fmt_list<<EOF" >> $GITHUB_OUTPUT
+        echo "$FILES_CHANGED" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
         echo "Formatting issues fixed."
       shell: bash
       continue-on-error: true
     
     - name: Commit Formatting Fixes
-      if: ${{ fromJson(steps.fmt.outputs.tofu_fmt_count || '0') > 0 }} && ${{ toJson(steps.fmt.outputs.stderr) == '' }}
+      if: ${{ steps.fmt.outputs.tofu_fmt_count > 0  &&  !steps.fmt.outputs.stderr }}
       id: fix_fmt
       uses: EndBug/add-and-commit@v9
       with:
@@ -116,8 +133,9 @@ jobs:
     needs: setup
     permissions:
       id-token: write
-      contents: read
-    if: ${{ needs.setup.outputs.fmt == 0 }}
+      contents: write
+      pull-requests: write
+    if: ${{ needs.setup.outputs.fmt == 0 }} && ${{ false }}
     steps:
     - name: 'Checkout code'
       uses: 'actions/checkout@v4'
@@ -125,9 +143,48 @@ jobs:
         fetch-depth: 0
         ref: ${{ github.head_ref }}
 
-    ##- name: 'Setup OpenTofu and Lint'
-    ##  id: tofu_plan
-    ##  uses: './.github/actions/tofu_plan_lint'
-    ##  with:
-    ##    tofu_directory: './tofu'
-    ##    tofuvars_location: './tofu/tofu.tf'
+    - name: 'Authenticate with GCP'
+      uses: './.github/actions/auth_to_gcp'
+      with:
+        gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
+        gcp_workload_pool: ${{ secrets.GCP_WORKLOAD_POOL }}
+        gcp_workload_provider: ${{ secrets.GCP_WORKLOAD_PROVIDER }}
+
+    - name: 'Setup OpenTofu and Lint'
+      id: tofu_plan_lint
+      with:
+        tofu_directory: ${{ env.TOFU_PATH }}/deployment
+      uses: './.github/actions/tofu_plan_lint'
+      env:
+        TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+        TF_VAR_project_name: ${{ secrets.GCP_PROJECT_NAME }}
+        TF_VAR_region: ${{ vars.GCP_REGION }}
+        TF_VAR_zone: ${{ vars.GCP_ZONE }} 
+        TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+        tfstates_bucket: ${{ secrets.TFSTATE_BUCKET }}
+        tfstates_prefix: ${{ secrets.TFSTATE_PREFIX }}
+
+    - name: PR Comment (OpenTofu Plan)
+      uses: 'mshick/add-pr-comment@v2'
+      if: always()
+      with:
+        refresh-message-position: true
+        message-id: ${{ github.event.pull_request.id }}-TOFU-PLAN
+        message: |
+          ### 🚀 OpenTofu Plan Output
+          The OpenTofu plan has been successfully generated.
+          
+          ${{ steps.tofu_plan_lint.outputs.plan_summary && format('<details>\n<summary>🔍 View Plan Summary</summary>\n\n```markdown\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.plan_summary) }}
+                
+    - name: PR Comment (OpenTofu Errors)
+      uses: 'mshick/add-pr-comment@v2'  
+      if: ${{ steps.tofu_plan_lint.outputs.init_stderr || steps.tofu_plan_lint.outputs.validate_stderr }}
+      with:
+        refresh-message-position: true
+        message-id: ${{ github.event.pull_request.id }}-TOFU-ERROR
+        message: |
+          ### ⚠️ OpenTofu Validation Failed 🛠️
+          
+          ${{ steps.tofu_plan_lint.outputs.init_stderr && format('<details>\n<summary>🔍 Init Errors</summary>\n\n```bash\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.init_stderr) }}
+          
+          ${{ steps.tofu_plan_lint.outputs.validate_stderr && format('<details>\n<summary>🔍 Validation Errors</summary>\n\n```bash\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.validate_stderr) }}
