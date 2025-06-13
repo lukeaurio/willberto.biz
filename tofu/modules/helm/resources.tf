@@ -1,5 +1,5 @@
 locals {
-  yaml_content   = var.helm_value_file != "" ? yamldecode(file("${path.module}/${var.helm_value_file}/config.yaml")) : {}
+  yaml_content   = var.helm_value_file != "" ? yamldecode(file("${var.helm_value_file}")) : {}
   variables_list = var.helm_value_file != "" ? concat([for k, v in local.yaml_content : { key = k, value = v }], var.helm_values) : var.helm_values
 }
 
@@ -12,7 +12,41 @@ resource "helm_release" "this" {
   version    = var.helm_chart_version
   namespace  = var.helm_namespace
 
+  create_namespace = var.create_namespace
+  atomic           = var.atomic
+  timeout          = var.timeout
+  cleanup_on_fail  = var.cleanup_on_fail
+  wait             = var.wait
+  reuse_values     = var.reuse_values
+  description      = var.release_description
+
   values = local.variables_list
+
+  dynamic "set" {
+    for_each = var.set_values
+    content {
+      name  = set.value.name
+      value = set.value.value
+      type  = set.value.type
+    }
+  }
+
+  dynamic "set_string" {
+    for_each = var.set_string_values
+    content {
+      name  = set_string.value.name
+      value = set_string.value.value
+    }
+  }
+
+  dynamic "set_sensitive" {
+    for_each = var.set_sensitive_values
+    content {
+      name  = set_sensitive.value.name
+      value = set_sensitive.value.value
+      type  = set_sensitive.value.type
+    }
+  }
 
   set {
     name  = "replicaCount"
