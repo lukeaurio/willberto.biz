@@ -116,6 +116,11 @@ variable "helm_value_file" {
   description = "The path to a custom Helm values YAML file. Values from this file will be merged with other value settings."
   type        = string
   default     = "" # Default to empty string, indicating no file is used unless specified.
+
+  validation {
+    condition     = var.helm_value_file == "" || can(file(var.helm_value_file))
+    error_message = "The specified helm_value_file does not exist or cannot be read. Please provide a valid file path or leave it empty."
+  } 
 }
 
 variable "helm_values" {

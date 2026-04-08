@@ -48,8 +48,11 @@ resource "helm_release" "this" {
     }
   }
 
-  set {
-    name  = "replicaCount"
-    value = var.replica_count
-  }
+  dynamic "set" {
+    #Generate Replica count if needed s
+    for_each =  var.replica_count > 0 ? { "replicaCount" = var.replica_count } : {} 
+    content {
+      name  = each.key
+      value = each.value
+    }
 }
