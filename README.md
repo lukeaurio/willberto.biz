@@ -14,6 +14,26 @@ This project sets up the necessary Google Cloud resources to host and manage the
     - Follow the deployment scripts and instructions provided in the `deploy` directory.\
     - git actions help comes from this article [here](https://alexanderhose.com/how-to-integrate-github-actions-with-google-cloud-platform/)
 
+## Development Setup
+
+### Pre-commit Hook (OpenTofu formatting)
+
+Before committing, ensure [OpenTofu](https://opentofu.org/docs/intro/install/) is installed:
+
+```sh
+tofu --version
+```
+
+Then install the pre-commit hook to auto-format Tofu/Terraform files on every commit:
+
+```sh
+printf '%s\n' '#!/usr/bin/env sh' 'set -e' 'if ! command -v tofu >/dev/null 2>&1; then echo "Error: opentofu (tofu) is not installed. See https://opentofu.org/docs/intro/install/" >&2; exit 1; fi' 'tofu fmt --recursive' > .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+```
+
+This hook will:
+1. Verify `tofu` is installed before proceeding.
+2. Recursively format all `.tf` files using `tofu fmt`.
+
 ## Contributing
 
 Contributions are welcome! Please submit a pull request or open an issue to discuss any changes.

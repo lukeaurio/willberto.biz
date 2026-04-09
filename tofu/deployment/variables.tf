@@ -62,11 +62,12 @@ variable "helm_releases" {
   type = list(object({
     name          = string
     namespace     = string
+    chart_name    = string
     repo_url      = string
     chart         = string
     version       = string
-    values        = optional(list(string))
-    values_file   = optional(string)
+    values        = optional(list(string), [])
+    values_file   = optional(string, "")
     replica_count = number
   }))
   default = []
