@@ -1,6 +1,6 @@
 locals {
-  yaml_content   = var.helm_value_file != "" ? yamldecode(file("${var.helm_value_file}")) : {}
-  variables_list = var.helm_value_file != "" ? concat([for k, v in local.yaml_content : { key = k, value = v }], var.helm_values) : var.helm_values
+  yaml_content   = var.helm_value_file != "" ? [file("${var.helm_value_file}")] : []
+  variables_list = var.helm_value_file != "" ? concat(local.yaml_content, var.helm_values) : var.helm_values
 }
 
 # This is the helm release resource. It will deploy the helm chart to the kubernetes cluster
@@ -52,8 +52,8 @@ resource "helm_release" "this" {
     #Generate Replica count if needed - This is a common value that many charts use, so we want to make it easy to set without having to create a values file or use the set_values variable. If replica_count is greater than 0, we will add it to the set values. If it is 0, we will not add it.
     for_each =  var.replica_count > 0 ? { "replicaCount" = var.replica_count } : {} 
     content {
-      name  = "replicaCount"
-      value = each.value
+      name  = set.key
+      value = set.value
     }
   }
 }
