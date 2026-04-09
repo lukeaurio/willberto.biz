@@ -50,7 +50,7 @@ resource "helm_release" "this" {
 
   dynamic "set" {
     #Generate Replica count if needed - This is a common value that many charts use, so we want to make it easy to set without having to create a values file or use the set_values variable. If replica_count is greater than 0, we will add it to the set values. If it is 0, we will not add it.
-    for_each =  var.replica_count > 0 ? { "replicaCount" = var.replica_count } : {} 
+    for_each = var.replica_count > 0 ? { "replicaCount" = var.replica_count } : {}
     content {
       name  = set.key
       value = set.value
