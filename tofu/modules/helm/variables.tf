@@ -10,26 +10,6 @@
 # limitations under the License.
 
 # ------------------------------------------------------------------------------
-# Kubernetes Cluster Configuration
-# Variables related to the Kubernetes cluster where the Helm chart will be deployed.
-# ------------------------------------------------------------------------------
-
-variable "kubernetes_cluster_name" {
-  description = "The name of the Kubernetes cluster where the Helm chart will be deployed. This is used for context and can be helpful for organizing resources if managing multiple clusters."
-  type        = string
-}
-
-variable "project_id" {
-  description = "The Google Cloud Platform (GCP) project ID where the Kubernetes cluster and other resources are located. This is essential for provider configuration and resource association."
-  type        = string
-}
-
-variable "region" {
-  description = "The GCP region where the GKE cluster is located. This helps in targeting the correct regional resources and services."
-  type        = string
-}
-
-# ------------------------------------------------------------------------------
 # Helm Chart Configuration
 # Variables for specifying the Helm chart, its version, and repository.
 # ------------------------------------------------------------------------------
