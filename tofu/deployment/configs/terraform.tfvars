@@ -1,3 +1,7 @@
+####
+# This file contains the variables for the helm module. These variables are used to deploy helm charts to the kubernetes cluster. The values for these variables are defined in the terraform.tfvars file.
+####
+
 helm_releases = {
   nginx_ingress = {
     name          = "nginx"
