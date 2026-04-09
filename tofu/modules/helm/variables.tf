@@ -149,15 +149,6 @@ variable "set_values" {
   default = []
 }
 
-variable "set_string_values" {
-  description = "A list of objects to set specific string values in the Helm chart. Each object must have 'name' (string) and 'value' (string). This ensures the value is treated strictly as a string."
-  type = list(object({
-    name  = string
-    value = string
-  }))
-  default = []
-}
-
 variable "set_sensitive_values" {
   description = "A list of objects to set sensitive values in the Helm chart (e.g., passwords, API keys). These values are not logged by Helm. Each object must have 'name' (string) and 'value' (string). An optional 'type' (string) can be specified; defaults to 'auto'."
   type = list(object({
