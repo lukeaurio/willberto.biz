@@ -120,7 +120,7 @@ variable "helm_value_file" {
   validation {
     condition     = var.helm_value_file == "" || can(file(var.helm_value_file))
     error_message = "The specified helm_value_file does not exist or cannot be read. Please provide a valid file path or leave it empty."
-  } 
+  }
 }
 
 variable "helm_values" {
@@ -136,7 +136,7 @@ variable "replica_count" {
   validation {
     condition     = var.replica_count >= 0
     error_message = "replica_count must be a non-negative integer."
-   } 
+  }
 }
 
 variable "set_values" {
