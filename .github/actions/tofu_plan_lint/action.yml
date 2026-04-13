@@ -34,8 +34,7 @@ runs:
   using: 'composite'
   steps:
     - name: Set Up Opentofu
-      uses: opentofu/setup-opentofu@v1
-
+      uses: opentofu/setup-opentofu@v2
     - name: Install tftools
       run: |
         curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/tftools/main/scripts/install.sh | bash

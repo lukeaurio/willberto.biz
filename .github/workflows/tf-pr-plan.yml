@@ -26,7 +26,7 @@ jobs:
         ref: ${{ github.event.pull_request.head.ref }} #We need to make sure we get the right ref per the usage of add-and-commit
     
     - name: Set Up Opentofu
-      uses: opentofu/setup-opentofu@v1
+      uses: opentofu/setup-opentofu@v2
 
     - name: Check TofuFormatting 
       id: fmt
