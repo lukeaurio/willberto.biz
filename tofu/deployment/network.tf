@@ -14,7 +14,9 @@ resource "google_compute_subnetwork" "default" {
   stack_type       = "IPV4_IPV6"
   ipv6_access_type = "INTERNAL" # Change to "EXTERNAL" if creating an external loadbalancer
 
-  network = google_compute_network.default.id
+
+  private_ip_google_access = true
+  network                  = google_compute_network.default.id
   secondary_ip_range {
     range_name    = "services-range"
     ip_cidr_range = "10.1.0.0/24"
@@ -23,5 +25,9 @@ resource "google_compute_subnetwork" "default" {
   secondary_ip_range {
     range_name    = "pod-ranges"
     ip_cidr_range = "10.2.0.0/24"
+  }
+  depends_on = [google_compute_network.default]
+  lifecycle {
+    ignore_changes = [network]
   }
 }
