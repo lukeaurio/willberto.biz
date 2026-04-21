@@ -195,13 +195,13 @@ jobs:
 
           {
             echo "comment_body<<TOFU_COMMENT"
-            echo "## OpenTofu check failed"
+            echo "###☹️ OpenTofu check failed"
             echo
-            echo "| Step | Result |"
-            echo "| --- | --- |"
-            echo "| Init | $init_result |"
-            echo "| Validate | $validate_result |"
-            echo "| Plan | $plan_result |"
+            echo "| Check | Status |"
+            echo "| :---- | :----- |"
+            echo "| Initialization | $( [ \"$init_result\" = \"Passed\" ] && echo '✅ Passed' || echo '❌ Failed' ) |"
+            echo "| Validation | $( [ \"$validate_result\" = \"Passed\" ] && echo '✅ Passed' || echo '❌ Failed' ) |"
+            echo "| Plan | $( [ \"$plan_result\" = \"Passed\" ] && echo '✅ Passed' || echo '❌ Failed' ) |"
 
             if [ -n "$INIT_STDERR" ]; then
               echo
@@ -246,16 +246,16 @@ jobs:
 
           {
             echo "comment_body<<TOFU_COMMENT"
-            echo "## OpenTofu plan"
+            echo "###🦖 OpenTofu plan"
             echo
-            echo "| Step | Result |"
-            echo "| --- | --- |"
-            echo "| Init | Passed |"
-            echo "| Validate | Passed |"
-            echo "| Plan | Passed |"
+            echo "| Check | Status |"
+            echo "| :---- | :----- |"
+            echo "| Initialization | ✅ Passed |"
+            echo "| Validation | ✅ Passed |"
+            echo "| Plan | ✅ Passed |"
             echo
             echo "<details open>"
-            echo "<summary>Plan summary</summary>"
+            echo "<summary><strong>Plan summary</strong></summary>"
             echo
             echo "$PLAN_SUMMARY"
             echo

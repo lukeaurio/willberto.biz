@@ -35,10 +35,6 @@ runs:
   steps:
     - name: Set Up Opentofu
       uses: opentofu/setup-opentofu@v2
-    - name: Install tftools
-      run: |
-        curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/containerscrew/tftools/main/scripts/install.sh | bash
-      shell: bash
 
     - name: OpenTofu Init
       id: init
@@ -66,7 +62,34 @@ runs:
       id: parse_plan
       run: |
         if [ -f "plan.tfplan" ]; then
-          SUMMARY=$(tofu show -json plan.tfplan | tftools summarize --show-tags --show-unchanged --compact)
+          SUMMARY=$(tofu show -json plan.tfplan | jq -r '
+            def classify:
+              if . == ["create"] then "Create"
+              elif . == ["update"] then "Update"
+              elif . == ["delete"] then "Destroy"
+              elif . == ["delete", "create"] or . == ["create", "delete"] then "Replace"
+              elif . == ["no-op"] then "Unchanged"
+              else "Other"
+              end;
+
+            [.resource_changes[]? | {group: (.change.actions | classify), address}]
+            | if length == 0 then
+                "_No resource changes found._"
+              else
+                sort_by(.address) as $changes
+                | ($changes
+                  | group_by(.group)
+                  | map({key: .[0].group, value: .})
+                  | from_entries) as $grouped
+                | ["Create", "Update", "Replace", "Destroy", "Unchanged", "Other"]
+                | map(
+                    select($grouped[.] != null)
+                    | "### \(.) (\($grouped[.] | length))\n"
+                    + ($grouped[.] | map("- `\(.address)`") | join("\n"))
+                  )
+                | join("\n\n")
+              end
+          ')
           echo "summary<<EOF" >> $GITHUB_OUTPUT
           echo "$SUMMARY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
