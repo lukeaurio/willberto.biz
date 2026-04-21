@@ -1,12 +1,12 @@
 resource "google_compute_network" "default" {
-  name = lower("${var.project_name}")
+  name = local.project_name_sanitized
 
   auto_create_subnetworks  = false
   enable_ula_internal_ipv6 = true
 }
 
 resource "google_compute_subnetwork" "default" {
-  name = lower("${var.project_name}-sub")
+  name = "${local.project_name_sanitized}-sub"
 
   ip_cidr_range = "10.0.0.0/24"
   region        = "us-central1"

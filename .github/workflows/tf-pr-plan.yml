@@ -26,7 +26,7 @@ jobs:
         ref: ${{ github.event.pull_request.head.ref }} #We need to make sure we get the right ref per the usage of add-and-commit
     
     - name: Set Up Opentofu
-      uses: opentofu/setup-opentofu@v1
+      uses: opentofu/setup-opentofu@v2
 
     - name: Check TofuFormatting 
       id: fmt
@@ -164,27 +164,111 @@ jobs:
         tfstates_bucket: ${{ secrets.TFSTATE_BUCKET }}
         tfstates_prefix: ${{ secrets.TFSTATE_PREFIX }}
 
-    - name: PR Comment (OpenTofu Plan)
-      uses: 'mshick/add-pr-comment@v2'
+    - name: Build OpenTofu PR Comments
+      id: tofu_comments
       if: always()
+      env:
+        PLAN_SUMMARY: ${{ steps.tofu_plan_lint.outputs.plan_summary }}
+        INIT_STDERR: ${{ steps.tofu_plan_lint.outputs.init_stderr }}
+        VALIDATE_STDERR: ${{ steps.tofu_plan_lint.outputs.validate_stderr }}
+        PLAN_STDERR: ${{ steps.tofu_plan_lint.outputs.plan_stderr }}
+        PR_ID: ${{ github.event.pull_request.id }}
+      run: |
+        init_result="Passed"
+        validate_result="Passed"
+        plan_result="Passed"
+
+        if [ -n "$INIT_STDERR" ]; then
+          init_result="Failed"
+        fi
+
+        if [ -n "$VALIDATE_STDERR" ]; then
+          validate_result="Failed"
+        fi
+
+        if [ -n "$PLAN_STDERR" ]; then
+          plan_result="Failed"
+        fi
+
+        if [ -n "$INIT_STDERR" ] || [ -n "$VALIDATE_STDERR" ] || [ -n "$PLAN_STDERR" ]; then
+          echo "message_id=$PR_ID-TOFU-ERROR" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "comment_body<<TOFU_COMMENT"
+            echo "###☹️ OpenTofu check failed"
+            echo
+            echo "| Check | Status |"
+            echo "| :---- | :----- |"
+            echo "| Initialization | $( [ \"$init_result\" = \"Passed\" ] && echo '✅ Passed' || echo '❌ Failed' ) |"
+            echo "| Validation | $( [ \"$validate_result\" = \"Passed\" ] && echo '✅ Passed' || echo '❌ Failed' ) |"
+            echo "| Plan | $( [ \"$plan_result\" = \"Passed\" ] && echo '✅ Passed' || echo '❌ Failed' ) |"
+
+            if [ -n "$INIT_STDERR" ]; then
+              echo
+              echo "<details open>"
+              echo "<summary>Init error</summary>"
+              echo
+              echo '```text'
+              echo "$INIT_STDERR"
+              echo '```'
+              echo
+              echo "</details>"
+            fi
+
+            if [ -n "$VALIDATE_STDERR" ]; then
+              echo
+              echo "<details open>"
+              echo "<summary>Validation error</summary>"
+              echo
+              echo '```text'
+              echo "$VALIDATE_STDERR"
+              echo '```'
+              echo
+              echo "</details>"
+            fi
+
+            if [ -n "$PLAN_STDERR" ]; then
+              echo
+              echo "<details open>"
+              echo "<summary>Plan error</summary>"
+              echo
+              echo '```text'
+              echo "$PLAN_STDERR"
+              echo '```'
+              echo
+              echo "</details>"
+            fi
+
+            echo "TOFU_COMMENT"
+          } >> "$GITHUB_OUTPUT"
+        else
+          echo "message_id=$PR_ID-TOFU-PLAN" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "comment_body<<TOFU_COMMENT"
+            echo "###🦖 OpenTofu plan"
+            echo
+            echo "| Check | Status |"
+            echo "| :---- | :----- |"
+            echo "| Initialization | ✅ Passed |"
+            echo "| Validation | ✅ Passed |"
+            echo "| Plan | ✅ Passed |"
+            echo
+            echo "<details open>"
+            echo "<summary><strong>Plan summary</strong></summary>"
+            echo
+            echo "$PLAN_SUMMARY"
+            echo
+            echo "</details>"
+            echo "TOFU_COMMENT"
+          } >> "$GITHUB_OUTPUT"
+        fi
+      shell: bash
+
+    - name: PR Comment (OpenTofu)
+      uses: 'mshick/add-pr-comment@v2'
+      if: ${{ always() && steps.tofu_comments.outputs.comment_body }}
       with:
         refresh-message-position: true
-        message-id: ${{ github.event.pull_request.id }}-TOFU-PLAN
-        message: |
-          ### 🚀 OpenTofu Plan Output
-          The OpenTofu plan has been successfully generated.
-          
-          ${{ steps.tofu_plan_lint.outputs.plan_summary && format('<details>\n<summary>🔍 View Plan Summary</summary>\n\n```markdown\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.plan_summary) }}
-                
-    - name: PR Comment (OpenTofu Errors)
-      uses: 'mshick/add-pr-comment@v2'  
-      if: ${{ steps.tofu_plan_lint.outputs.init_stderr || steps.tofu_plan_lint.outputs.validate_stderr }}
-      with:
-        refresh-message-position: true
-        message-id: ${{ github.event.pull_request.id }}-TOFU-ERROR
-        message: |
-          ### ⚠️ OpenTofu Validation Failed 🛠️
-          
-          ${{ steps.tofu_plan_lint.outputs.init_stderr && format('<details>\n<summary>🔍 Init Errors</summary>\n\n```bash\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.init_stderr) }}
-          
-          ${{ steps.tofu_plan_lint.outputs.validate_stderr && format('<details>\n<summary>🔍 Validation Errors</summary>\n\n```bash\n{0}\n```\n\n</details>', steps.tofu_plan_lint.outputs.validate_stderr) }}
+        message-id: ${{ steps.tofu_comments.outputs.message_id }}
+        message: ${{ steps.tofu_comments.outputs.comment_body }}
