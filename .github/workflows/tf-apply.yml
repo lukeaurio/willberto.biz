@@ -45,5 +45,5 @@ jobs:
     - name: OpenTofu Apply
       id: apply
       working-directory: ${{ env.TOFU_PATH }}/deployment
-      run: tofu apply -auto-approve -no-color
+      run: tofu apply -auto-approve -no-color $(find . -maxdepth 1 -name '*.tfvars' -o -name '*.tfvars.json' | xargs -I {} echo "-var-file={}")
       shell: bash
