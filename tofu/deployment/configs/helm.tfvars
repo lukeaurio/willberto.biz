@@ -9,7 +9,7 @@ helm_releases = [
     chart_name    = "nginx"
     version       = "4.0.6"
     namespace     = "nginx-tofutest"
-    values_file   = "${path.module}/../helm/nginx/nginx-values.yaml"
+    values_file   = "helm/nginx/nginx-values.yaml"
     replica_count = 0
   }
 ]
