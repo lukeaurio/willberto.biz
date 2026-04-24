@@ -64,7 +64,6 @@ variable "helm_releases" {
     namespace     = string
     chart_name    = string
     repo_url      = string
-    chart         = string
     version       = string
     values        = optional(list(string), [])
     values_file   = optional(string, "")
