@@ -67,7 +67,7 @@ variable "helm_releases" {
     version       = string
     values        = optional(list(string), [])
     values_file   = optional(string, "")
-    replica_count = number
+    replica_count = number # When Set to Zero, it reverts to using the Chart's Definition of replicasets
   }))
   default = []
 

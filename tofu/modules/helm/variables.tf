@@ -112,7 +112,7 @@ variable "helm_values" {
 variable "replica_count" {
   description = "A common Helm chart value: the number of replicas of the application to deploy. This is provided as a convenience but can also be set via 'set_values' or a values file."
   type        = number
-  default     = 0 # Default to zero replicas.
+  default     = 0 # Default to not setting a replica set in tofu
   validation {
     condition     = var.replica_count >= 0
     error_message = "replica_count must be a non-negative integer."
