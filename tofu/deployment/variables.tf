@@ -74,31 +74,31 @@ variable "helm_releases" {
   validation {
     condition = alltrue([
       for release in var.helm_releases :
-        release.values_file == "" || (release.values_file != "" && can(file("../../${release.values_file}")))
+      release.values_file == "" || (release.values_file != "" && can(file("../../${release.values_file}")))
     ])
     error_message = "Helm Charts: All charts with a values file must be a file inside the current repository"
   }
 
   validation {
     condition = alltrue([
-      for release in var.helm_releases : 
-        release.replica_count >= 0
+      for release in var.helm_releases :
+      release.replica_count >= 0
     ])
     error_message = "Helm Charts: replica_count must be a non-negative integer for all releases"
-  }  
+  }
   validation {
     condition = alltrue([
-      for release in var.helm_releases : 
-        length(release.values) == 0 || (length(release.values) > 0 && alltrue([
-          for value in release.values : can(regex("^[^=]+=[^=]+$", value)) 
-        ]))
+      for release in var.helm_releases :
+      length(release.values) == 0 || (length(release.values) > 0 && alltrue([
+        for value in release.values : can(regex("^[^=]+=[^=]+$", value))
+      ]))
     ])
     error_message = "Helm Charts: All fields (name, namespace, chart_name, repo_url, version) must be non-empty for all releases"
   }
   validation {
     condition = alltrue([
-      for release in var.helm_releases : 
-        release.name != "" && release.namespace != "" && release.chart_name != "" && release.repo_url != "" && release.version != ""
+      for release in var.helm_releases :
+      release.name != "" && release.namespace != "" && release.chart_name != "" && release.repo_url != "" && release.version != ""
     ])
     error_message = "Helm Charts: All fields (name, namespace, chart_name, repo_url, version) must be non-empty for all releases"
   }
