@@ -2,7 +2,7 @@
 
 module "helm" {
   source              = "../modules/helm"
-  for_each            = { for k, v in var.helm_releases : v.name => v }
+  for_each            = { for k, v in var.helm_releases : v.name => v if v.disabled != true }
   helm_chart_name     = each.value.chart_name
   helm_release_name   = each.value.name
   helm_repository_url = each.value.repo_url

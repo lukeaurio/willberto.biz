@@ -68,6 +68,7 @@ variable "helm_releases" {
     values        = optional(list(string), [])
     values_file   = optional(string, "")
     replica_count = number # When Set to Zero, it reverts to using the Chart's Definition of replicasets
+    disabled      = optional(bool, false)
   }))
   default = []
 
@@ -102,5 +103,4 @@ variable "helm_releases" {
     ])
     error_message = "Helm Charts: All fields (name, namespace, chart_name, repo_url, version) must be non-empty for all releases"
   }
-
 }
