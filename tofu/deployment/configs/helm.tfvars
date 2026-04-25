@@ -5,7 +5,7 @@
 helm_releases = [
   {
     name          = "nginx"
-    repo_url      = "https://charts.bitnami.com/bitnami"
+    repo_url      = "oci://registry-1.docker.io/bitnamicharts"
     chart_name    = "nginx"
     version       = "latest"
     namespace     = "nginx-tofutest"
