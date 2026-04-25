@@ -22,8 +22,14 @@ resource "google_container_cluster" "default" {
     cluster_secondary_range_name  = google_compute_subnetwork.default.secondary_ip_range[1].range_name
   }
 
-  deletion_protection = true
+  deletion_protection = false
   lifecycle {
     ignore_changes = [network, subnetwork] # Ignore changes to network and subnetwork to prevent unnecessary updates
+  }
+}
+removed {
+  from = google_container_cluster.default
+  lifecycle {
+    destroy = false
   }
 }
