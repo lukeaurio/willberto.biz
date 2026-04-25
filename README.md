@@ -42,7 +42,7 @@ staged_files="$(git diff --cached --name-only --diff-filter=ACMR -- '*.tf' '*.tf
 
 echo "$staged_files" | while IFS= read -r file; do
   [ -n "$file" ] || continue
-  tofu fmt "$file"
+  tofu fmt "$file" -no-color
 done
 
 echo "$staged_files" | while IFS= read -r file; do
