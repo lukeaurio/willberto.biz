@@ -9,7 +9,7 @@ resource "helm_release" "this" {
   name       = var.helm_release_name
   repository = var.helm_repository_url
   chart      = var.helm_chart_name
-  version    = var.helm_chart_version
+  version    = var.helm_chart_version == "latest" ? null : var.helm_chart_version # If version is set to "latest", we will pass null to use the latest version available in the repository. This allows users to easily use the latest version without having to update their configuration.
   namespace  = var.helm_namespace
 
   create_namespace = var.create_namespace
