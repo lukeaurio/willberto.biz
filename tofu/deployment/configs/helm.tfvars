@@ -10,5 +10,6 @@ helm_releases = [
     version     = "latest"
     namespace   = "nginx-tofutest"
     values_file = "helm/nginx/nginx-values.yaml"
+    replica_count = 0
   }
 ]
