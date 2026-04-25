@@ -20,8 +20,16 @@ variable "helm_chart_name" {
 }
 
 variable "helm_chart_version" {
-  description = "The specific version of the Helm chart to be deployed (e.g., '1.16.0'). Pinning the version ensures repeatable deployments."
+  description = "The specific version of the Helm chart to be deployed (e.g., '1.16.0'). Pinning the version ensures repeatable deployments. This can be null or empty to use the latest version available in the repository."
   type        = string
+  validation {
+    condition     = var.helm_chart_version == null || var.helm_chart_version != ""
+    error_message = "The Helm chart version must be a non-empty string or null."
+  }
+  validation {
+    condition = var.helm_chart_version == "latest" || can(regex("^\\d+\\.\\d+\\.\\d+$", var.helm_chart_version))
+    error_message = "The Helm chart version must be 'latest' or a valid semantic version (e.g., '1.16.0')"
+  }
 }
 
 variable "helm_repository_url" {

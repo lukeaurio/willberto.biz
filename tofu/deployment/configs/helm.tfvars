@@ -7,9 +7,9 @@ helm_releases = [
     name          = "nginx"
     repo_url      = "https://charts.bitnami.com/bitnami"
     chart_name    = "nginx"
-    version       = "23.0.3"
+    version       = latest
     namespace     = "nginx-tofutest"
     values_file   = "helm/nginx/nginx-values.yaml"
-    replica_count = 0
+    
   }
 ]
