@@ -27,12 +27,36 @@ tofu --version
 Then install the pre-commit hook to auto-format Tofu/Terraform files on every commit:
 
 ```sh
-printf '%s\n' '#!/usr/bin/env sh' 'set -e' 'if ! command -v tofu >/dev/null 2>&1; then echo "Error: opentofu (tofu) is not installed. See https://opentofu.org/docs/intro/install/" >&2; exit 1; fi' 'tofu fmt --recursive' > .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+cat > .git/hooks/pre-commit <<'EOF'
+#!/usr/bin/env sh
+set -e
+
+if ! command -v tofu >/dev/null 2>&1; then
+  echo "Error: opentofu (tofu) is not installed. See https://opentofu.org/docs/intro/install/" >&2
+  exit 1
+fi
+
+staged_files="$(git diff --cached --name-only --diff-filter=ACMR -- '*.tf' '*.tfvars' '*.tftest.hcl' '*.tfmock.hcl')"
+
+[ -z "$staged_files" ] && exit 0
+
+echo "$staged_files" | while IFS= read -r file; do
+  [ -n "$file" ] || continue
+  tofu fmt "$file"
+done
+
+echo "$staged_files" | while IFS= read -r file; do
+  [ -n "$file" ] || continue
+  git add -- "$file"
+done
+EOF
+chmod +x .git/hooks/pre-commit
 ```
 
 This hook will:
 1. Verify `tofu` is installed before proceeding.
-2. Recursively format all `.tf` files using `tofu fmt`.
+2. Format only staged OpenTofu/Terraform files using `tofu fmt`.
+3. Re-stage those formatted files so the commit and push include the changes.
 
 ## Contributing
 
