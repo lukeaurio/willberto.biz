@@ -27,7 +27,7 @@ variable "helm_chart_version" {
     error_message = "The Helm chart version must be a non-empty string or null."
   }
   validation {
-    condition = var.helm_chart_version == "latest" || can(regex("^\\d+\\.\\d+\\.\\d+$", var.helm_chart_version))
+    condition     = var.helm_chart_version == "latest" || can(regex("^\\d+\\.\\d+\\.\\d+$", var.helm_chart_version))
     error_message = "The Helm chart version must be 'latest' or a valid semantic version (e.g., '1.16.0')"
   }
 }
