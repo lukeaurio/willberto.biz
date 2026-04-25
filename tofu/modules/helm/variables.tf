@@ -57,9 +57,9 @@ variable "helm_namespace" {
 }
 
 variable "create_namespace" {
-  description = "A boolean flag indicating whether to create the Kubernetes namespace if it does not already exist. Defaults to false."
+  description = "A boolean flag indicating whether to create the Kubernetes namespace if it does not already exist. Defaults to true."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "atomic" {
