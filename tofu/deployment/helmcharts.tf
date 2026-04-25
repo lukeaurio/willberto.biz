@@ -14,7 +14,7 @@ module "helm" {
 }
 
 removed {
-  from = module.helm.nginx
+  from = module.helm["nginx"]
   lifecycle {
     destroy = false
   }

@@ -37,4 +37,4 @@ override.tf.json
 terraform.rc
 
 # ignore codex files
-*.codexs
+*.codex
