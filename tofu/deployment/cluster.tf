@@ -5,8 +5,16 @@ resource "google_container_cluster" "default" {
   enable_autopilot         = true
   enable_l4_ilb_subsetting = true
 
+
   network    = google_compute_network.default.id
   subnetwork = google_compute_subnetwork.default.id
+
+  cluster_autoscaling {
+    auto_provisioning_defaults {
+      service_account = google_service_account.cluster_autopilot.email
+      oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
+    }
+  }
 
   ip_allocation_policy {
     stack_type                    = "IPV4_IPV6"
