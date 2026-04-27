@@ -28,7 +28,7 @@ resource "google_container_cluster" "autopilot" {
   }
 }
 removed {
-  from = google_container_cluster.autopilot
+  from = google_container_cluster.default
   lifecycle {
     destroy = false
   }
