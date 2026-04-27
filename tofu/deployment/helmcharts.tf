@@ -10,7 +10,7 @@
 #  helm_values         = each.value.values
 #  helm_value_file     = "../../${each.value.values_file}" #Chartpaths are relative to the root of the module
 #  replica_count       = each.value.replica_count
-#  depends_on          = [resource.google_container_cluster.default]
+#  depends_on          = [resource.google_container_cluster.autopilot]
 #}
 
 removed {

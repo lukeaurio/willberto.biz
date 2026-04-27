@@ -44,7 +44,7 @@ provider "random" {
 
 # Retrieve the cluster endpoint and CA certificate
 data "google_container_cluster" "my_cluster" {
-  name     = google_container_cluster.default.name
+  name     = google_container_cluster.autopilot.name
   project  = var.project_id
   location = var.region
 }
