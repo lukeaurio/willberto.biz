@@ -27,9 +27,3 @@ resource "google_container_cluster" "autopilot" {
     ignore_changes = [network, subnetwork] # Ignore changes to network and subnetwork to prevent unnecessary updates
   }
 }
-removed {
-  from = google_container_cluster.default
-  lifecycle {
-    destroy = false
-  }
-}

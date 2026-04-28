@@ -1,5 +1,5 @@
 ## We're configuring the Helm provider in the module definition, Mostly because we're writing this in a way that we can build multiple clusters with the same module
-## But Dang it we cant Dynamically generate Providers in terraform, so we have to do it here. Man Hashicorp, you really need to let us do this. I want to be able to write a module that can create multiple clusters and then have the provider configuration be dynamic based on the cluster that was created. 
+## But Dang it we cant Dynamically generate Providers in terraform, so we have to do it here. Man Hashicorp, you really need to let us do this. I want to be able to write a module that can create multiple clusters and then have the provider configuration be dynamic based on the cluster that was created.
 #
 provider "kubernetes" {
   host  = "https://${google_container_cluster.autopilot.endpoint}"
