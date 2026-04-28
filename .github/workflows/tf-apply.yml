@@ -1,4 +1,4 @@
-name: Deploy code to GCP
+name: Deploy OpenTofu config to GCP
 
 on:
   push:
