@@ -1,0 +1,247 @@
+name: Terraform Destroy Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type "DESTROY_CONFIRMED" to proceed with destruction'
+        required: true
+        type: string
+      target_resources:
+        description: 'Optional: Specific resources to destroy (comma-separated, e.g. "module.bucket,google_compute_instance.example"). Leave empty to destroy all resources.'
+        required: false
+        type: string
+        default: ''
+
+env:
+  TOFU_PATH: ./tofu
+  TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+  TF_VAR_project_name: ${{ secrets.GCP_PROJECT_NAME }}
+  TF_VAR_region: ${{ vars.GCP_REGION }}
+  TF_VAR_zone: ${{ vars.GCP_ZONE }} 
+  TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+  tfstates_bucket: ${{ secrets.TFSTATE_BUCKET }}
+  tfstates_prefix: ${{ secrets.TFSTATE_PREFIX }}
+
+jobs:
+  validate-confirmation:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Validate Confirmation'
+      run: |
+        if [ "${{ github.event.inputs.confirmation }}" != "DESTROY_CONFIRMED" ]; then
+          echo "❌ ERROR: Confirmation phrase is incorrect!"
+          echo "You must type exactly 'DESTROY_CONFIRMED' to proceed with destruction."
+          echo "Received: '${{ github.event.inputs.confirmation }}'"
+          exit 1
+        fi
+        echo "✅ Confirmation validated successfully"
+        if [ -n "${{ github.event.inputs.target_resources }}" ]; then
+          echo "Target resources: ${{ github.event.inputs.target_resources }}"
+        else
+          echo "⚠️  WARNING: Will destroy ALL infrastructure resources!"
+        fi
+
+  destroy-plan:
+    runs-on: ubuntu-latest
+    needs: validate-confirmation
+    
+    permissions:
+      id-token: write
+      contents: read
+
+    outputs:
+      plan-exists: ${{ steps.plan.outputs.plan-exists }}
+      resources-to-destroy: ${{ steps.plan.outputs.resources-to-destroy }}
+
+    steps:
+    - name: 'Checkout code'
+      uses: 'actions/checkout@v4'
+
+    - name: Set Up Opentofu
+      uses: opentofu/setup-opentofu@v2
+
+    - name: 'Authenticate with GCP'
+      uses: './.github/actions/auth_to_gcp'
+      with:
+        gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
+        gcp_workload_pool: ${{ secrets.GCP_WORKLOAD_POOL }}
+        gcp_workload_provider: ${{ secrets.GCP_WORKLOAD_PROVIDER }}
+    
+    - name: OpenTofu Init
+      id: init
+      working-directory: ${{ env.TOFU_PATH }}/deployment
+      run: tofu init -backend-config="bucket=${{ env.tfstates_bucket }}" -backend-config="prefix=${{ env.tfstates_prefix }}" -input=false -no-color
+      shell: bash
+      
+    - name: Generate Destroy Plan
+      id: plan
+      working-directory: ${{ env.TOFU_PATH }}/deployment
+      run: |
+        # Prepare target flags if specific resources are specified
+        TARGET_FLAGS=""
+        if [ -n "${{ github.event.inputs.target_resources }}" ]; then
+          IFS=',' read -ra TARGETS <<< "${{ github.event.inputs.target_resources }}"
+          for target in "${TARGETS[@]}"; do
+            TARGET_FLAGS="$TARGET_FLAGS -target=$(echo $target | xargs)"
+          done
+          echo "Using target flags: $TARGET_FLAGS"
+        fi
+        
+        # Generate variable file flags
+        VAR_FILES=$(find . -maxdepth 2 -name '*.tfvars' -o -name '*.tfvars.json' | xargs -I {} echo "-var-file={}")
+        
+        # Generate destroy plan
+        echo "Generating destroy plan..."
+        tofu plan -destroy $TARGET_FLAGS $VAR_FILES -no-color -out=destroy.tfplan
+        
+        # Parse plan output for summary
+        tofu show -no-color destroy.tfplan > plan_output.txt
+        
+        # Check if plan has changes
+        if grep -q "No changes" plan_output.txt; then
+          echo "plan-exists=false" >> $GITHUB_OUTPUT
+          echo "resources-to-destroy=0" >> $GITHUB_OUTPUT
+          echo "ℹ️  No resources to destroy"
+        else
+          echo "plan-exists=true" >> $GITHUB_OUTPUT
+          # Count resources to be destroyed
+          DESTROY_COUNT=$(grep -c "will be destroyed" plan_output.txt || echo "0")
+          echo "resources-to-destroy=$DESTROY_COUNT" >> $GITHUB_OUTPUT
+          echo "📋 Plan Summary:"
+          echo "Resources to be destroyed: $DESTROY_COUNT"
+        fi
+        
+        # Store plan for next job
+      shell: bash
+
+    - name: Upload Destroy Plan
+      if: steps.plan.outputs.plan-exists == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: destroy-plan
+        path: ${{ env.TOFU_PATH }}/deployment/destroy.tfplan
+        retention-days: 1
+
+    - name: Display Plan Summary
+      if: steps.plan.outputs.plan-exists == 'true'
+      working-directory: ${{ env.TOFU_PATH }}/deployment
+      run: |
+        echo "## 🗑️ Terraform Destroy Plan Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Resources to be destroyed**: ${{ steps.plan.outputs.resources-to-destroy }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -n "${{ github.event.inputs.target_resources }}" ]; then
+          echo "**Target Resources**: ${{ github.event.inputs.target_resources }}" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "**Scope**: All managed resources" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "### Resources that will be destroyed:" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        grep "will be destroyed" plan_output.txt | head -20 >> $GITHUB_STEP_SUMMARY || echo "Unable to parse destroy list" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "⚠️ **This action cannot be undone. Proceed with caution!**" >> $GITHUB_STEP_SUMMARY
+
+  execute-destroy:
+    runs-on: ubuntu-latest
+    needs: [validate-confirmation, destroy-plan]
+    if: needs.destroy-plan.outputs.plan-exists == 'true'
+    
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: 'Checkout code'
+      uses: 'actions/checkout@v4'
+
+    - name: Set Up Opentofu
+      uses: opentofu/setup-opentofu@v2
+
+    - name: 'Authenticate with GCP'
+      uses: './.github/actions/auth_to_gcp'
+      with:
+        gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
+        gcp_workload_pool: ${{ secrets.GCP_WORKLOAD_POOL }}
+        gcp_workload_provider: ${{ secrets.GCP_WORKLOAD_PROVIDER }}
+    
+    - name: OpenTofu Init
+      working-directory: ${{ env.TOFU_PATH }}/deployment
+      run: tofu init -backend-config="bucket=${{ env.tfstates_bucket }}" -backend-config="prefix=${{ env.tfstates_prefix }}" -input=false -no-color
+      shell: bash
+
+    - name: Download Destroy Plan
+      uses: actions/download-artifact@v4
+      with:
+        name: destroy-plan
+        path: ${{ env.TOFU_PATH }}/deployment/
+
+    - name: Execute Terraform Destroy
+      id: destroy
+      working-directory: ${{ env.TOFU_PATH }}/deployment
+      run: |
+        echo "🗑️ Executing terraform destroy..."
+        echo "Resources to destroy: ${{ needs.destroy-plan.outputs.resources-to-destroy }}"
+        
+        # Execute the destroy using the plan file
+        tofu apply -auto-approve -no-color destroy.tfplan
+        
+        echo "✅ Terraform destroy completed successfully"
+      shell: bash
+
+    - name: Verify Destroy Results
+      working-directory: ${{ env.TOFU_PATH }}/deployment
+      run: |
+        echo "🔍 Verifying destroy results..."
+        
+        # Check state file to confirm resources were destroyed
+        STATE_RESOURCES=$(tofu state list | wc -l)
+        echo "Remaining resources in state: $STATE_RESOURCES"
+        
+        if [ "$STATE_RESOURCES" -eq 0 ]; then
+          echo "✅ All resources successfully destroyed - state is clean"
+        else
+          echo "ℹ️ $STATE_RESOURCES resources remain in state (may be expected if using selective targeting)"
+          echo "Remaining resources:"
+          tofu state list
+        fi
+      shell: bash
+
+    - name: Generate Destroy Summary
+      run: |
+        echo "## 🎯 Terraform Destroy Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Status**: ✅ Successfully completed" >> $GITHUB_STEP_SUMMARY
+        echo "**Resources destroyed**: ${{ needs.destroy-plan.outputs.resources-to-destroy }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Triggered by**: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Timestamp**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -n "${{ github.event.inputs.target_resources }}" ]; then
+          echo "**Targeted Resources**: ${{ github.event.inputs.target_resources }}" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "**Scope**: Complete infrastructure destruction" >> $GITHUB_STEP_SUMMARY
+        fi
+
+  no-changes:
+    runs-on: ubuntu-latest
+    needs: [validate-confirmation, destroy-plan]
+    if: needs.destroy-plan.outputs.plan-exists == 'false'
+    
+    steps:
+    - name: No Changes Required
+      run: |
+        echo "## ℹ️ No Changes Required" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "No resources need to be destroyed based on the current state and targeting." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ -n "${{ github.event.inputs.target_resources }}" ]; then
+          echo "**Target Resources**: ${{ github.event.inputs.target_resources }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The specified target resources may not exist or have already been destroyed." >> $GITHUB_STEP_SUMMARY
+        fi
