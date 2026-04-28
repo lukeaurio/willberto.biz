@@ -43,10 +43,10 @@ provider "random" {
 }
 
 # Retrieve the cluster endpoint and CA certificate
-#data "google_container_cluster" "my_cluster" {
-#  name     = google_container_cluster.autopilot.name
-#  project  = var.project_id
-#  location = var.region
-#}
+data "google_container_cluster" "my_cluster" {
+  name     = google_container_cluster.autopilot.name
+  project  = var.project_id
+  location = var.region
+}
 
 data "google_client_config" "current" {} # Gotta define this for the use of the Helm and Kubernetes providers
