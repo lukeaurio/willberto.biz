@@ -1,5 +1,4 @@
 name: OpenTofu Destroy Infrastructure
-
 on:
   workflow_dispatch:
     inputs:
