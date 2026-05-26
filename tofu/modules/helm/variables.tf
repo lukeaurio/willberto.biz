@@ -9,6 +9,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+##------------------------------------------------------------------------------
+# GCP Helm Module Variables
+# This file defines the variables used by the Helm module to deploy Helm charts to a Kubernetes cluster
+##------------------------------------------------------------------------------
+
+variable "gcp_project_id" {
+  description = "The GCP project ID where the Kubernetes cluster is located. This is used for authentication to google services via service accounts and may be required for certain Helm charts that interact with GCP resources."
+  type        = string
+  sensitive   = true
+  default     = ""
+
+  validation {
+    condition = length(var.gcp_project_id) == 0 || (
+      length(var.gcp_project_id) > 0 &&
+      can(regex("^[a-z][-a-z0-9:.]{4,61}[a-z0-9]$", var.gcp_project_id)) &&
+      (var.create_service_account == true || var.create_secret_store == true)
+    )
+    error_message = "The GCP project ID must be a non-empty string and a valid format when creating a service account or secret store. If neither is enabled, it can be left empty."
+  }
+}
+
+variable "gcp_project_name" {
+  description = "The GCP project name. This is used for informational purposes and may be required for certain Helm charts that interact with GCP resources."
+  type        = string
+  sensitive   = true
+  default     = ""
+
+  validation {
+    condition     = length(var.gcp_project_name) == 0 || (length(var.gcp_project_name) > 0 && can(regex("^[a-zA-Z][-a-zA-Z0-9:.]{4,61}[a-zA-Z0-9]$", var.gcp_project_name)) && var.create_service_account == true)
+    error_message = "The GCP project name must be a non-empty string and a valid format when creating a service account. If not creating a service account, it can be left empty."
+  }
+}
+
 # ------------------------------------------------------------------------------
 # Helm Chart Configuration
 # Variables for specifying the Helm chart, its version, and repository.
@@ -150,3 +183,80 @@ variable "set_sensitive_values" {
   }))
   default = []
 }
+
+## ------------------------------------------------------------------------------ 
+# Service Account Configuration
+# Variables for creating a Kubernetes Service Account for the Helm release, if needed.
+# ------------------------------------------------------------------------------
+
+variable "create_service_account" {
+  description = "A boolean flag indicating whether to create a Kubernetes Service Account for the Helm release. If true, a Service Account will be created with the name '${var.helm_release_name}-sa' in the specified namespace. Defaults to false."
+  type        = bool
+  default     = false
+
+}
+
+variable "accessible_secrets" {
+  description = "A list of Kubernetes secrets that the Service Account should have access to. This allows the Helm release to use these secrets if needed."
+  type        = list(string)
+  default     = []
+}
+
+variable "gcp_roles" {
+  description = "A list of GCP IAM roles to bind to the Service Account created for the Helm release. This allows the release to interact with GCP resources if necessary."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for role in var.gcp_roles : can(regex("^roles\\/[a-z]+\\.[a-zA-Z]+$", role))
+    ])
+    error_message = "Each GCP IAM role must be in the format 'roles/service.role' (e.g., 'roles/storage.objectViewer')."
+  }
+}
+
+## ------------------------------------------------------------------------------
+# Secret Store Configuration
+# Variables for creating an External Secrets SecretStore or ClusterSecretStore for Google Secret Manager using the External Secrets Operator (This ideally should be at the cluster level).
+# ------------------------------------------------------------------------------
+
+variable "create_secret_store" {
+  description = "A boolean flag indicating whether to create an External Secrets SecretStore or ClusterSecretStore for Google Secret Manager using the module-managed Kubernetes service account. Defaults to false."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = var.create_secret_store == false || var.create_service_account == true
+    error_message = "create_secret_store requires create_service_account to also be true."
+  }
+}
+
+variable "secret_store_kind" {
+  description = "The kind of External Secrets store to create. Must be SecretStore or ClusterSecretStore."
+  type        = string
+  default     = "SecretStore"
+
+  validation {
+    condition     = contains(["SecretStore", "ClusterSecretStore"], var.secret_store_kind)
+    error_message = "secret_store_kind must be one of: SecretStore, ClusterSecretStore."
+  }
+}
+
+
+variable "secret_store_cluster_project_id" {
+  description = "Optional cluster project ID for workload identity when the cluster lives in a different project."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.secret_store_cluster_project_id == "" || can(regex("^[a-z][-a-z0-9:.]{4,61}[a-z0-9]$", var.secret_store_cluster_project_id))
+    error_message = "secret_store_cluster_project_id must be empty or a valid GCP project ID."
+  }
+}
+
+variable "secret_store_cluster_location" {
+  description = "Optional cluster location for workload identity when it should be set explicitly."
+  type        = string
+  default     = ""
+}
+

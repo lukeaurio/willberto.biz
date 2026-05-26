@@ -1,6 +1,7 @@
 locals {
   yaml_content   = var.helm_value_file != "" ? [file("${var.helm_value_file}")] : []
   variables_list = var.helm_value_file != "" ? concat(local.yaml_content, var.helm_values) : var.helm_values
+  sa_name        = "${var.helm_release_name}-sa"
 }
 
 # This is the helm release resource. It will deploy the helm chart to the kubernetes cluster
@@ -48,4 +49,30 @@ resource "helm_release" "this" {
       value = set.value
     }
   }
+}
+
+resource "kubernetes_service_account" "this" {
+  count = var.create_service_account ? 1 : 0
+  metadata {
+    name      = local.sa_name
+    namespace = var.helm_namespace
+    annotations = {
+      "opentofu/managed-by"   = "terraform"
+      "opentofu/helm-release" = var.helm_release_name
+    }
+  }
+  dynamic "secret" {
+    for_each = toset(var.accessible_secrets != null ? var.accessible_secrets : [])
+    content {
+      name = secret.value
+    }
+  }
+  depends_on = [helm_release.this]
+}
+
+resource "google_project_iam_member" "this" {
+  for_each = var.create_service_account ? toset(var.gcp_roles != null ? var.gcp_roles : []) : []
+  project  = var.gcp_project_id
+  role     = each.value
+  member   = "principal://iam.googleapis.com/projects/${var.gcp_project_id}/locations/global/workloadIdentityPools/${var.gcp_project_name}.svc.id.goog/subject/ns/${var.helm_namespace}/sa/${local.sa_name}"
 }
