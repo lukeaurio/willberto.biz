@@ -133,6 +133,7 @@ variable "helm_external_secret_stores" {
     secret_store_kind    = optional(string, "ClusterSecretStore")
     service_account_name = string
     disabled             = optional(bool, false)
+    uses_external_secret = optional(bool, false) # If true will wait to create the helm chart until after secret stores are created, (for helm charts which need secrets)
   }))
   default = []
 
@@ -282,7 +283,7 @@ variable "helm_external_secrets" {
 }
 
 # Optional Google Secret Manager secrets useful for ExternalSecret examples
-variable "example_google_secrets" {
+variable "google_secrets" {
   description = "Optional Google Secret Manager secrets created by Terraform for ExternalSecret testing."
   type = list(object({
     secret_id   = string
@@ -296,7 +297,7 @@ variable "example_google_secrets" {
 
   validation {
     condition = alltrue([
-      for secret in var.example_google_secrets :
+      for secret in var.google_secrets :
       can(regex("^[A-Za-z0-9_-]+$", secret.secret_id))
     ])
     error_message = "Example Google Secrets: secret_id must contain only letters, numbers, underscores, and hyphens."
@@ -304,15 +305,15 @@ variable "example_google_secrets" {
 
   validation {
     condition = alltrue([
-      for secret in var.example_google_secrets :
+      for secret in var.google_secrets :
       length(secret.value) > 0
     ])
     error_message = "Example Google Secrets: value must be non-empty for all items."
   }
 
   validation {
-    condition = length(var.example_google_secrets) == length(distinct([
-      for secret in var.example_google_secrets : secret.secret_id
+    condition = length(var.google_secrets) == length(distinct([
+      for secret in var.google_secrets : secret.secret_id
     ]))
     error_message = "Example Google Secrets: secret_id values must be unique."
   }
