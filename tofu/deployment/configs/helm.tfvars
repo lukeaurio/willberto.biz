@@ -37,28 +37,28 @@ helm_external_secret_stores = [
 
 helm_external_secrets = [
   {
-    name               = "example-app-secret"
-    namespace          = "nginx-tofutest"
+    name               = "cloudflare-tunnel-secret"
+    namespace          = "flux-cd"
     refresh_interval   = "1h0m0s"
     secret_store_name  = "cluster-gsm-store"
     secret_store_kind  = "ClusterSecretStore"
-    target_secret_name = "example-app-secret"
+    target_secret_name = "cloudflare-tunnel-secret"
     creation_policy    = "Owner"
     data = [
       {
-        secret_key = "API_TOKEN"
-        remote_key = "example-app-api-token"
+        secret_key = "CLOUDFLARE_API_TOKEN"
+        remote_key = "cloudflare-api-token"
       }
     ]
   }
 ]
 
-example_google_secrets = [
+google_secrets = [
   {
-    secret_id = "example-app-api-token"
-    value     = "replace-with-real-value"
+    secret_id = "cloudflare-api-token"
+    value     = "<ThisIsABigOlTest>"
     labels = {
-      app = "example"
+      app = "global"
     }
   }
 ]
