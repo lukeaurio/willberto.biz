@@ -24,9 +24,9 @@ variable "gcp_project_id" {
     condition = length(var.gcp_project_id) == 0 || (
       length(var.gcp_project_id) > 0 &&
       can(regex("^[a-z][-a-z0-9:.]{4,61}[a-z0-9]$", var.gcp_project_id)) &&
-      (var.create_service_account == true || var.create_secret_store == true)
+      var.create_service_account == true
     )
-    error_message = "The GCP project ID must be a non-empty string and a valid format when creating a service account or secret store. If neither is enabled, it can be left empty."
+    error_message = "The GCP project ID must be a non-empty string and a valid format when creating a service account. If not creating a service account, it can be left empty."
   }
 }
 
@@ -190,7 +190,7 @@ variable "set_sensitive_values" {
 # ------------------------------------------------------------------------------
 
 variable "create_service_account" {
-  description = "A boolean flag indicating whether to create a Kubernetes Service Account for the Helm release. If true, a Service Account will be created with the name '${var.helm_release_name}-sa' in the specified namespace. Defaults to false."
+  description = "A boolean flag indicating whether to create a Kubernetes Service Account for the Helm release. If true, a Service Account will be created with the name '<Helm Release Name>-sa' in the specified namespace. Defaults to false."
   type        = bool
   default     = false
 
@@ -213,50 +213,5 @@ variable "gcp_roles" {
     ])
     error_message = "Each GCP IAM role must be in the format 'roles/service.role' (e.g., 'roles/storage.objectViewer')."
   }
-}
-
-## ------------------------------------------------------------------------------
-# Secret Store Configuration
-# Variables for creating an External Secrets SecretStore or ClusterSecretStore for Google Secret Manager using the External Secrets Operator (This ideally should be at the cluster level).
-# ------------------------------------------------------------------------------
-
-variable "create_secret_store" {
-  description = "A boolean flag indicating whether to create an External Secrets SecretStore or ClusterSecretStore for Google Secret Manager using the module-managed Kubernetes service account. Defaults to false."
-  type        = bool
-  default     = false
-
-  validation {
-    condition     = var.create_secret_store == false || var.create_service_account == true
-    error_message = "create_secret_store requires create_service_account to also be true."
-  }
-}
-
-variable "secret_store_kind" {
-  description = "The kind of External Secrets store to create. Must be SecretStore or ClusterSecretStore."
-  type        = string
-  default     = "SecretStore"
-
-  validation {
-    condition     = contains(["SecretStore", "ClusterSecretStore"], var.secret_store_kind)
-    error_message = "secret_store_kind must be one of: SecretStore, ClusterSecretStore."
-  }
-}
-
-
-variable "secret_store_cluster_project_id" {
-  description = "Optional cluster project ID for workload identity when the cluster lives in a different project."
-  type        = string
-  default     = ""
-
-  validation {
-    condition     = var.secret_store_cluster_project_id == "" || can(regex("^[a-z][-a-z0-9:.]{4,61}[a-z0-9]$", var.secret_store_cluster_project_id))
-    error_message = "secret_store_cluster_project_id must be empty or a valid GCP project ID."
-  }
-}
-
-variable "secret_store_cluster_location" {
-  description = "Optional cluster location for workload identity when it should be set explicitly."
-  type        = string
-  default     = ""
 }
 
