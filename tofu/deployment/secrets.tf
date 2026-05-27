@@ -1,3 +1,8 @@
+locals {
+  secret_ids = toset([for secret in var.google_secrets : nonsensitive(secret.secret_id)])
+}
+
+
 resource "google_secret_manager_secret" "secrets" {
   for_each = {
     for secret in var.google_secrets :
