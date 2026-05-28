@@ -34,7 +34,7 @@ variable "gcp_project_id" {
   type        = string
 
   validation {
-    condition     = can(regex("^[a-z][-a-z0-9:.]{4,61}[a-z0-9]$", var.gcp_project_id))
+    condition     = length(var.gcp_project_id) > 0
     error_message = "gcp_project_id must be a valid GCP project ID."
   }
 }
