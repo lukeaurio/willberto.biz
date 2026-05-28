@@ -1,5 +1,5 @@
 locals {
-  secret_ids = nonsensitive(toset([for secret in var.google_secrets : secret.disabled == true ? nonsensitive(secret.secret_id) : null]))
+  secret_ids = nonsensitive(toset([for secret in var.google_secrets : secret.disabled != false ? nonsensitive(secret.secret_id) : null]))
 }
 
 
