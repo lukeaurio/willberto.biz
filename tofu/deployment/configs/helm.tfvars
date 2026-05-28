@@ -22,6 +22,7 @@ helm_releases = [
     values_file               = "helm/external-secrets/external-secrets-values.yaml"
     create_service_account    = true
     service_account_gcp_roles = ["roles/secretmanager.secretAccessor"]
+    replica_count             = 0
   }
 
 ]
@@ -55,7 +56,7 @@ helm_external_secrets = [
 
 google_secrets = [
   {
-    secret_id = "cloudflare-api-token"
+    secret_id = "cloudflare-tunnel-secret"
     value     = "<ThisIsABigOlTest>"
     labels = {
       app = "global"
