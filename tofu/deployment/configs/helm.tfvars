@@ -22,7 +22,7 @@ helm_releases = [
     values_file               = "helm/external-secrets/external-secrets-values.yaml"
     create_service_account    = true
     service_account_gcp_roles = ["roles/secretmanager.secretAccessor"]
-    replica_count             = 0
+    replica_count             = 1
   }
 
 ]
