@@ -71,6 +71,7 @@ variable "helm_releases" {
     create_service_account             = optional(bool, false)
     service_account_accessible_secrets = optional(list(string), [])
     service_account_gcp_roles          = optional(list(string), [])
+    uses_external_secret               = optional(bool, false) # If true will wait to create the helm chart until after external secrets are created, (for helm charts which need secrets)
     disabled                           = optional(bool, false)
   }))
   default = []
