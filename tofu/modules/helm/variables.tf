@@ -21,7 +21,7 @@ variable "gcp_project_id" {
   default     = ""
 
   validation {
-    condition = length(var.gcp_project_id) == 0 || (
+    condition = var.create_service_account == false || (
       length(var.gcp_project_id) > 0 &&
       can(regex("^[a-z][-a-z0-9:.]{4,61}[a-z0-9]$", var.gcp_project_id)) &&
       var.create_service_account == true
@@ -37,7 +37,7 @@ variable "gcp_project_name" {
   default     = ""
 
   validation {
-    condition     = length(var.gcp_project_name) == 0 || (length(var.gcp_project_name) > 0 && can(regex("^[a-zA-Z][-a-zA-Z0-9:.]{4,61}[a-zA-Z0-9]$", var.gcp_project_name)) && var.create_service_account == true)
+    condition     = var.create_service_account == false || (length(var.gcp_project_name) > 0 && can(regex("^[a-zA-Z][-a-zA-Z0-9:.]{4,61}[a-zA-Z0-9]$", var.gcp_project_name)) && var.create_service_account == true)
     error_message = "The GCP project name must be a non-empty string and a valid format when creating a service account. If not creating a service account, it can be left empty."
   }
 }
