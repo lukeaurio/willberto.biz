@@ -23,5 +23,5 @@ resource "google_secret_manager_secret_version" "secrets" {
   for_each = local.secret_ids
 
   secret      = google_secret_manager_secret.secrets[each.key].id
-  secret_data = templatefile(local.secret_values[each.key].value, local.variable_overrides)
+  secret_data = templatestring(local.secret_values[each.key].value, local.variable_overrides)
 }
