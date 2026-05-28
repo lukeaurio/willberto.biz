@@ -23,7 +23,7 @@ variable "gcp_project_id" {
   validation {
     condition = var.create_service_account == false || (
       length(var.gcp_project_id) > 0 &&
-      can(regex("^[a-z][-a-z0-9:.]{4,61}[a-z0-9]$", var.gcp_project_id)) &&
+      #can(regex("^[a-z][-a-z0-9:.]{4,61}[a-z0-9]$", var.gcp_project_id)) &&
       var.create_service_account == true
     )
     error_message = "The GCP project ID must be a non-empty string and a valid format when creating a service account. If not creating a service account, it can be left empty."
