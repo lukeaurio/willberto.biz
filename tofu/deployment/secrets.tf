@@ -1,12 +1,12 @@
 locals {
-  secret_ids = nonsensitive(toset([for secret in var.google_secrets : secret.disabled != false ? nonsensitive(secret.secret_id) : null]))
+  secret_ids = nonsensitive(toset(compact([for secret in var.google_secrets : !secret.disabled ? nonsensitive(secret.secret_id) : null])))
 }
 
 
 resource "google_secret_manager_secret" "secrets" {
-  for_each  = toset(local.secret_ids)
+  for_each  = local.secret_ids
   project   = var.project_id
-  secret_id = var.google_secrets[each.key].secret_id
+  secret_id = each.key
 
   labels = merge(var.google_secrets[each.key].labels, {
     managed_by = "opentofu"
@@ -19,7 +19,7 @@ resource "google_secret_manager_secret" "secrets" {
 }
 
 resource "google_secret_manager_secret_version" "secrets" {
-  for_each = toset(local.secret_ids)
+  for_each = local.secret_ids
 
   secret      = google_secret_manager_secret.secrets[each.key].id
   secret_data = templatefile(var.google_secrets[each.key].value, local.variable_overrides)
