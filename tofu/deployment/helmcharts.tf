@@ -26,7 +26,7 @@ module "helm_external_secret_stores" {
   namespace            = each.value.namespace
   gcp_project_id       = var.project_id
   service_account_name = each.value.service_account_name
-  depends_on           = [module.helm]
+  depends_on           = [module.helm["external-secrets"]]
 }
 
 module "helm_external_secrets" {
