@@ -69,8 +69,8 @@ variable "helm_repository_url" {
   description = "The URL of the Helm repository containing the chart (e.g., 'oci://ghcr.io/bitnami'). This must be an OCI URL or Google Storage URL where Helm will fetch the chart from."
   type        = string
   validation {
-    condition     = can(regex("^(oci://|gs://)", var.helm_repository_url))
-    error_message = "The Helm repository URL must be an OCI URL starting with 'oci://' or a Google Storage URL starting with 'gs://'."
+    condition     = can(regex("^(oci://|gs://|https://)", var.helm_repository_url))
+    error_message = "The Helm repository URL must be an OCI URL starting with 'oci://', a Google Storage URL starting with 'gs://', or an HTTPS URL."
   }
 }
 

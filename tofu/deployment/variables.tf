@@ -104,9 +104,9 @@ variable "helm_releases" {
   validation {
     condition = alltrue([
       for release in var.helm_releases :
-      release.repo_url != "" && (can(regex("^https?://", release.repo_url)) || can(regex("^oci://", release.repo_url)))
+      release.repo_url != "" && (can(regex("^(oci://|gs://|https://)", release.repo_url)))
     ])
-    error_message = "Helm Charts: repo_url must be a valid URL (https, or oci) for all releases"
+    error_message = "Helm Charts: repo_url must be a valid URL (https, oci, or gs) for all releases"
   }
 
   validation {
