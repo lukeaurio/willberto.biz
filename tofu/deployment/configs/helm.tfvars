@@ -15,9 +15,9 @@ helm_releases = [
   },
   {
     name                      = "external-secrets"
-    repo_url                  = "https://charts.external-secrets.io/external-secrets/external-secrets"
+    repo_url                  = "https://ghcr.io/external-secrets"
     chart_name                = "external-secrets"
-    version                   = "0.9.0"
+    version                   = "latest"
     namespace                 = "external-secrets"
     values_file               = "helm/external-secrets/external-secrets-values.yaml"
     create_service_account    = true
