@@ -100,6 +100,15 @@ variable "helm_releases" {
     ])
     error_message = "Helm Charts: All fields (name, namespace, chart_name, repo_url, version) must be non-empty for all releases"
   }
+
+  validation {
+    condition = alltrue([
+      for release in var.helm_releases :
+      release.repo_url != "" && (can(regex("^https?://", release.repo_url)) || can(regex("^oci://", release.repo_url)))
+    ])
+    error_message = "Helm Charts: repo_url must be a valid URL (https, or oci) for all releases"
+  }
+
   validation {
     condition = alltrue([
       for release in var.helm_releases :
