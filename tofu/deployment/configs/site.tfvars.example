@@ -14,3 +14,48 @@ tfstates_bucket = "your-tfstate-bucket-name"
 
 # Cloudflare API Token for DNS management
 cloudflare_api_token = "your-cloudflare-api-token"
+
+# Optional: Define External Secrets stores (SecretStore / ClusterSecretStore)
+helm_external_secret_stores = [
+	{
+		name                 = "cluster-gsm-store"
+		namespace            = "external-secrets"
+		secret_store_kind    = "ClusterSecretStore"
+		service_account_name = "external-secrets-sa"
+		disabled             = false
+	}
+]
+
+# Optional: Define ExternalSecret resources to sync GSM secrets into Kubernetes
+helm_external_secrets = [
+	{
+		name               = "example-app-secret"
+		namespace          = "default"
+		refresh_interval   = "1h0m0s"
+		secret_store_name  = "cluster-gsm-store"
+		secret_store_kind  = "ClusterSecretStore"
+		target_secret_name = "example-app-secret"
+		creation_policy    = "Owner"
+		data = [
+			{
+				secret_key = "API_TOKEN"
+				remote_key = "example-app-api-token"
+			}
+		]
+		disabled = false
+	}
+]
+
+# Optional: Example Google Secret Manager secret(s) created by Terraform
+# Replace values with secure values from your secret management workflow.
+example_google_secrets = [
+	{
+		secret_id   = "example-app-api-token"
+		value       = "replace-with-real-value"
+		version_env = "dev"
+		labels = {
+			app = "example"
+		}
+		disabled = true
+	}
+]

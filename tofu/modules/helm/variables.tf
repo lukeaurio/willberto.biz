@@ -9,6 +9,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+##------------------------------------------------------------------------------
+# GCP Helm Module Variables
+# This file defines the variables used by the Helm module to deploy Helm charts to a Kubernetes cluster
+##------------------------------------------------------------------------------
+
+variable "gcp_project_id" {
+  description = "The GCP project ID where the Kubernetes cluster is located. This is used for authentication to google services via service accounts and may be required for certain Helm charts that interact with GCP resources."
+  type        = string
+  sensitive   = true
+  default     = ""
+
+  validation {
+    condition = var.create_service_account == false || (
+      length(var.gcp_project_id) > 0 &&
+      #can(regex("^[a-z][-a-z0-9:.]{4,61}[a-z0-9]$", var.gcp_project_id)) &&
+      var.create_service_account == true
+    )
+    error_message = "The GCP project ID must be a non-empty string and a valid format when creating a service account. If not creating a service account, it can be left empty."
+  }
+}
+
+variable "gcp_project_name" {
+  description = "The GCP project name. This is used for informational purposes and may be required for certain Helm charts that interact with GCP resources."
+  type        = string
+  sensitive   = true
+  default     = ""
+
+  validation {
+    condition     = var.create_service_account == false || (length(var.gcp_project_name) > 0 && can(regex("^[a-zA-Z][-a-zA-Z0-9:.]{4,61}[a-zA-Z0-9]$", var.gcp_project_name)) && var.create_service_account == true)
+    error_message = "The GCP project name must be a non-empty string and a valid format when creating a service account. If not creating a service account, it can be left empty."
+  }
+}
+
 # ------------------------------------------------------------------------------
 # Helm Chart Configuration
 # Variables for specifying the Helm chart, its version, and repository.
@@ -150,3 +183,35 @@ variable "set_sensitive_values" {
   }))
   default = []
 }
+
+## ------------------------------------------------------------------------------ 
+# Service Account Configuration
+# Variables for creating a Kubernetes Service Account for the Helm release, if needed.
+# ------------------------------------------------------------------------------
+
+variable "create_service_account" {
+  description = "A boolean flag indicating whether to create a Kubernetes Service Account for the Helm release. If true, a Service Account will be created with the name '<Helm Release Name>-sa' in the specified namespace. Defaults to false."
+  type        = bool
+  default     = false
+
+}
+
+variable "accessible_secrets" {
+  description = "A list of Kubernetes secrets that the Service Account should have access to. This allows the Helm release to use these secrets if needed."
+  type        = list(string)
+  default     = []
+}
+
+variable "gcp_roles" {
+  description = "A list of GCP IAM roles to bind to the Service Account created for the Helm release. This allows the release to interact with GCP resources if necessary."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for role in var.gcp_roles : can(regex("^roles\\/[a-z]+\\.[a-zA-Z]+$", role))
+    ])
+    error_message = "Each GCP IAM role must be in the format 'roles/service.role' (e.g., 'roles/storage.objectViewer')."
+  }
+}
+
