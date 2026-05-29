@@ -71,8 +71,9 @@ resource "kubernetes_service_account" "this" {
 }
 
 resource "google_project_iam_member" "this" {
-  for_each = var.create_service_account ? toset(var.gcp_roles != null ? var.gcp_roles : []) : []
-  project  = var.gcp_project_id
-  role     = each.value
-  member   = "principal://iam.googleapis.com/projects/${var.gcp_project_id}/locations/global/workloadIdentityPools/${var.gcp_project_name}.svc.id.goog/subject/ns/${var.helm_namespace}/sa/${local.sa_name}"
+  for_each   = var.create_service_account ? toset(var.gcp_roles != null ? var.gcp_roles : []) : toset([])
+  project    = var.gcp_project_id
+  role       = each.value
+  member     = "principal://iam.googleapis.com/projects/${var.gcp_project_id}/locations/global/workloadIdentityPools/${var.gcp_project_name}.svc.id.goog/subject/ns/${var.helm_namespace}/sa/${local.sa_name}"
+  depends_on = [kubernetes_service_account.this]
 }
