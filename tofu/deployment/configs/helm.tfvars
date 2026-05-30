@@ -43,7 +43,7 @@ helm_external_secrets = [
     refresh_interval   = "1h0m0s"
     secret_store_name  = "cluster-gsm-store"
     secret_store_kind  = "ClusterSecretStore"
-    target_secret_name = "cloudflare-tunnel-secret"
+    target_secret_name = "cloudflare-api-token"
     creation_policy    = "Owner"
     data = [
       {
