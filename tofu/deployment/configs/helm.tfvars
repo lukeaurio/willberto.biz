@@ -15,7 +15,7 @@ helm_releases = [
   },
   {
     name                      = "external-secrets"
-    repo_url                  = "https://ghcr.io/external-secrets"
+    repo_url                  = "https://charts.external-secrets.io/external-secrets"
     chart_name                = "external-secrets"
     version                   = "latest"
     namespace                 = "external-secrets"
