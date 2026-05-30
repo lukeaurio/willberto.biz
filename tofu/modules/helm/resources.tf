@@ -49,6 +49,7 @@ resource "helm_release" "this" {
       value = set.value
     }
   }
+  depends_on = [kubernetes_service_account.this]
 }
 
 resource "kubernetes_service_account" "this" {
@@ -56,10 +57,12 @@ resource "kubernetes_service_account" "this" {
   metadata {
     name      = local.sa_name
     namespace = var.helm_namespace
-    annotations = {
-      "opentofu/managed-by"   = "terraform"
-      "opentofu/helm-release" = var.helm_release_name
-    }
+    annotations = merge(
+      {
+        "opentofu/managed-by"            = "terraform"
+        "opentofu/helm-release"          = var.helm_release_name
+        "iam.gke.io/gcp-service-account" = google_service_account.this[0].email
+    }, var.service_account_annotations)
   }
   dynamic "secret" {
     for_each = toset(var.accessible_secrets != null ? var.accessible_secrets : [])
@@ -70,10 +73,16 @@ resource "kubernetes_service_account" "this" {
   depends_on = [helm_release.this]
 }
 
+resource "google_service_account" "this" {
+  count        = var.create_service_account ? 1 : 0
+  account_id   = "${var.helm_release_name}-sa"
+  display_name = "${var.helm_release_name} Service Account"
+}
+
 resource "google_project_iam_member" "this" {
-  for_each   = var.create_service_account ? toset(var.gcp_roles != null ? var.gcp_roles : []) : toset([])
+  for_each   = var.create_service_account ? toset(var.gcp_roles != null ? concat(var.gcp_roles, "roles/iam.workloadIdentityUser") : []) : toset([])
   project    = var.gcp_project_id
   role       = each.value
-  member     = "principal://iam.googleapis.com/projects/${var.gcp_project_id}/locations/global/workloadIdentityPools/${var.gcp_project_name}.svc.id.goog/subject/ns/${var.helm_namespace}/sa/${local.sa_name}"
+  member     = "serviceAccount:${google_service_account.this[0].email}"
   depends_on = [kubernetes_service_account.this]
 }
