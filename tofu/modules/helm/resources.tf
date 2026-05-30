@@ -70,7 +70,6 @@ resource "kubernetes_service_account" "this" {
       name = secret.value
     }
   }
-  depends_on = [helm_release.this]
 }
 
 resource "google_service_account" "this" {
