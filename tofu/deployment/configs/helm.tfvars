@@ -56,7 +56,7 @@ helm_external_secrets = [
 
 google_secrets = [
   {
-    secret_id = "cloudflare-tunnel-secret"
+    secret_id = "cloudflare-api-token"
     value     = "$${cloudflare_token}"
     labels = {
       app = "global"

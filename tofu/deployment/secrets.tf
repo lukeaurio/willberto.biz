@@ -7,7 +7,7 @@ locals {
 resource "google_secret_manager_secret" "secrets" {
   for_each  = local.secret_ids
   project   = var.project_id
-  secret_id = each.key
+  secret_id = "${var.project_name}-${each.key}"
 
   labels = merge(local.secret_values[each.key].labels, {
     managed_by = "opentofu"
