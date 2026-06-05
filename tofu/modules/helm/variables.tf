@@ -193,7 +193,12 @@ variable "create_service_account" {
   description = "A boolean flag indicating whether to create a Kubernetes Service Account for the Helm release. If true, a Service Account will be created with the name '<Helm Release Name>-sa' in the specified namespace. Defaults to false."
   type        = bool
   default     = false
+}
 
+variable "service_account_annotations" {
+  description = "A map of annotations to add to the Service Account created for the Helm release. This can be used to add custom metadata or integrate with other tools that rely on annotations."
+  type        = map(string)
+  default     = {}
 }
 
 variable "accessible_secrets" {
