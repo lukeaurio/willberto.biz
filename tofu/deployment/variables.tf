@@ -274,14 +274,12 @@ variable "helm_external_secrets" {
   }
 
   validation {
-    condition = alltrue([
+    condition = alltrue(flatten([
       for secret in var.helm_external_secrets : [
-        alltrue([
-          for mapping in secret.data :
-          length([for s in var.google_secrets : s if s.disabled != true && s.secret_id == mapping.remote_key]) > 0
-        ])
+        for mapping in secret.data :
+        contains([for s in var.google_secrets : s.secret_id], mapping.remote_key)
       ]
-    ])
+    ]))
     error_message = "External Secrets: each item must reference a created Google Secret from google_secrets with matching secret_id."
   }
 
