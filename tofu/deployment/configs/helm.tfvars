@@ -27,7 +27,7 @@ helm_releases = [
   {
     name                   = "cloudflare-ingress"
     repo_url               = "https://helm.strrl.dev"
-    chart_name             = "strrl.dev/cloudflare-tunnel-ingress-controller"
+    chart_name             = "cloudflare-tunnel-ingress-controller"
     version                = "latest"
     namespace              = "cloudflare-ingress"
     values_file            = "helm/cloudflare-ingress/values.yaml"
