@@ -12,6 +12,7 @@ locals {
       labels = {
         app = "global"
       }
+      version_env = "060626"
     }
   ]
 }
@@ -22,9 +23,9 @@ resource "google_secret_manager_secret" "secrets" {
   project   = var.project_id
   secret_id = "${var.project_name}-${each.key}"
 
-  labels = merge(local.secret_values[each.key].labels, {
+  labels = merge(try(local.secret_values[each.key].labels, {}), {
     managed_by = "opentofu"
-    env        = local.secret_values[each.key].version_env
+    env        = try(local.secret_values[each.key].version_env, null)
   })
 
   replication {
