@@ -151,7 +151,7 @@ variable "helm_releases" {
   validation {
     condition = alltrue([
       for release in var.helm_releases :
-      (release.create_namespace == true && release.uses_external_secret == false) || (release.create_namespace == false && release.uses_external_secret == true)
+      provider::logic::xor(release.create_namespace == false, release.uses_external_secret == false)
     ])
     error_message = "Helm Charts: Helm releases that use external secrets must have create_namespace set to true to ensure the namespace exists before creating ExternalSecret resources."
   }

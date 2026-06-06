@@ -42,6 +42,10 @@ provider "cloudflare" {
 provider "random" {
 }
 
+provider "logic" {
+
+}
+
 # Retrieve the cluster endpoint and CA certificate
 data "google_container_cluster" "my_cluster" {
   name     = google_container_cluster.autopilot.name
