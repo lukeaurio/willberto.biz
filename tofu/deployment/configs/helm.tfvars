@@ -31,6 +31,7 @@ helm_releases = [
     version                = "latest"
     namespace              = "cloudflare-ingress"
     values_file            = "helm/cloudflare-ingress/values.yaml"
+    create_namespace       = false
     create_service_account = true
     replica_count          = 1
     uses_external_secret   = true
