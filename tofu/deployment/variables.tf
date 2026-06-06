@@ -39,6 +39,12 @@ variable "cloudflare_api_token" {
   sensitive   = true
 }
 
+variable "cloudflare_account_id" {
+  description = "Cloudflare account ID Associated with the Token"
+  type        = string
+  sensitive   = true
+}
+
 # Google Cloud Storage Buckets Configuration
 variable "buckets" {
   description = "Map of GCS buckets to create"
