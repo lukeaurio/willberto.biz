@@ -37,12 +37,20 @@ variable "cloudflare_api_token" {
   description = "The Cloudflare API Token"
   type        = string
   sensitive   = true
+  validation {
+    condition     = length(var.cloudflare_api_token) > 0
+    error_message = "The Cloudflare API token cannot be empty."
+  }
 }
 
 variable "cloudflare_account_id" {
-  description = "Cloudflare account ID Associated with the Token"
+  description = "Cloudflare account ID associated with the Token"
   type        = string
   sensitive   = true
+  validation {
+    condition     = length(var.cloudflare_account_id) > 0
+    error_message = "The Cloudflare account ID cannot be empty."
+  }
 }
 
 # Google Cloud Storage Buckets Configuration
