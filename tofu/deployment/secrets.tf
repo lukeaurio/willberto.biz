@@ -7,7 +7,7 @@ locals {
       value = jsonencode({
         api_token  = var.cloudflare_api_token
         tunnel_id  = try(cloudflare_zero_trust_tunnel_cloudflared.ingress_tunnel.id, null)
-        account_id = try(var.cloudflare_account_id, null)
+        account_id = var.cloudflare_account_id
       })
       labels = {
         app = "global"
