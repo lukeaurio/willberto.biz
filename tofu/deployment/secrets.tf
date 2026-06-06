@@ -1,6 +1,19 @@
 locals {
-  secret_ids    = nonsensitive(toset(compact([for secret in var.google_secrets : !secret.disabled ? nonsensitive(secret.secret_id) : null])))
-  secret_values = { for secret in var.google_secrets : secret.secret_id => secret }
+  secret_ids    = nonsensitive(toset(compact([for secret in concat(var.google_secrets, local.tfDependentSecrets) : !secret.disabled ? nonsensitive(secret.secret_id) : null])))
+  secret_values = { for secret in concat(var.google_secrets, local.tfDependentSecrets) : secret.secret_id => secret }
+  tfDependentSecrets = [
+    {
+      secret_id = "cloudflare-api-token"
+      value = jsonencode({
+        api_token  = var.cloudflare_api_token
+        tunnel_id  = try(cloudflare_zero_trust_tunnel_cloudflared.example_zero_trust_tunnel_cloudflared.id, null)
+        account_id = try(cloudflare_zero_trust_tunnel_cloudflared.example_zero_trust_tunnel_cloudflared.account_id, null)
+      })
+      labels = {
+        app = "global"
+      }
+    }
+  ]
 }
 
 

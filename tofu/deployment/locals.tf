@@ -4,7 +4,6 @@ locals {
   root_path = "${path.module}/.."
 
   variable_overrides = {
-    "cloudflare_token" = var.cloudflare_api_token
-    "gcp_project_id"   = var.project_id
+    "gcp_project_id" = var.project_id
   }
 }
