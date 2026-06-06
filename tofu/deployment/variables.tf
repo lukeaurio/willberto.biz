@@ -83,6 +83,7 @@ variable "helm_releases" {
     values_file                        = optional(string, "")
     replica_count                      = number # When Set to Zero, it reverts to using the Chart's Definition of replicasets
     create_service_account             = optional(bool, false)
+    create_namespace                   = optional(bool, true)
     service_account_accessible_secrets = optional(list(string), [])
     service_account_gcp_roles          = optional(list(string), [])
     uses_external_secret               = optional(bool, false) # If true will wait to create the helm chart until after external secrets are created, (for helm charts which need secrets)
@@ -145,6 +146,14 @@ variable "helm_releases" {
       length(release.service_account_gcp_roles) == length(distinct(release.service_account_gcp_roles))
     ])
     error_message = "Helm Charts: service_account_gcp_roles must contain unique values"
+  }
+
+  validation {
+    condition = alltrue([
+      for release in var.helm_releases :
+      (release.create_namespace == true && release.uses_external_secret == false) || (release.create_namespace == false && release.uses_external_secret == true)
+    ])
+    error_message = "Helm Charts: Helm releases that use external secrets must have create_namespace set to true to ensure the namespace exists before creating ExternalSecret resources."
   }
 }
 

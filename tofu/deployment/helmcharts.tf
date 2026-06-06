@@ -13,9 +13,23 @@ module "helm" {
   helm_value_file        = "../../${each.value.values_file}" #Chartpaths are relative to the root of the module
   replica_count          = each.value.replica_count
   create_service_account = each.value.create_service_account
+  create_namespace       = each.value.create_namespace
   accessible_secrets     = each.value.service_account_accessible_secrets
   gcp_roles              = each.value.service_account_gcp_roles
   depends_on             = [resource.google_container_cluster.autopilot]
+}
+
+module "namespaces" {
+  source   = "../modules/kube/Namespace"
+  for_each = { for k, v in var.helm_releases : v.name => v if v.disabled == false && v.uses_external_secret == true }
+  name     = each.value.namespace
+  labels = merge(
+    {
+      "opentofu/managed-by" = "terraform"
+    },
+    each.value.namespace_labels
+  )
+  annotations = {}
 }
 
 module "helm_with_external_secrets" {
@@ -32,7 +46,8 @@ module "helm_with_external_secrets" {
   helm_value_file        = "../../${each.value.values_file}" #Chartpaths are relative to the root of the module
   replica_count          = each.value.replica_count
   create_service_account = each.value.create_service_account
+  create_namespace       = each.value.create_namespace
   accessible_secrets     = each.value.service_account_accessible_secrets
   gcp_roles              = each.value.service_account_gcp_roles
-  depends_on             = [resource.google_container_cluster.autopilot, module.helm_external_secrets]
+  depends_on             = [resource.google_container_cluster.autopilot, module.helm_external_secrets, module.namespaces]
 }
