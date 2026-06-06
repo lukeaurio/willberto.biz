@@ -26,8 +26,7 @@ module "namespaces" {
   labels = merge(
     {
       "opentofu/managed-by" = "terraform"
-    },
-    each.value.namespace_labels
+    }
   )
   annotations = {}
 }
