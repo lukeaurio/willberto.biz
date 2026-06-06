@@ -20,7 +20,7 @@ module "helm" {
 }
 
 module "namespaces" {
-  source   = "../modules/kube/Namespace"
+  source   = "../modules/kube/namespace"
   for_each = { for k, v in var.helm_releases : v.name => v if v.disabled == false && v.uses_external_secret == true }
   name     = each.value.namespace
   labels = merge(
