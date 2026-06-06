@@ -50,7 +50,7 @@ helm_external_secret_stores = [
 helm_external_secrets = [
   {
     name               = "cloudflare-tunnel-secret"
-    namespace          = "flux-cd"
+    namespace          = "cloudflare-ingress"
     refresh_interval   = "1h0m0s"
     secret_store_name  = "cluster-gsm-store"
     secret_store_kind  = "ClusterSecretStore"
