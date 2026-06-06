@@ -23,6 +23,17 @@ helm_releases = [
     create_service_account    = true
     service_account_gcp_roles = ["roles/secretmanager.secretAccessor"]
     replica_count             = 1
+  },
+  {
+    name                   = "cloudflare-ingress"
+    repo_url               = "https://helm.strrl.dev"
+    chart_name             = "strrl.dev/cloudflare-tunnel-ingress-controller"
+    version                = "latest"
+    namespace              = "cloudflare-ingress"
+    values_file            = "helm/cloudflare-ingress/values.yaml"
+    create_service_account = true
+    replica_count          = 1
+    uses_external_secret   = true
   }
 
 ]
@@ -55,11 +66,4 @@ helm_external_secrets = [
 ]
 
 google_secrets = [
-  {
-    secret_id = "cloudflare-api-token"
-    value     = "$${cloudflare_token}"
-    labels = {
-      app = "global"
-    }
-  }
 ]

@@ -1,0 +1,15 @@
+cloudflare:
+  secretRef:
+    name: CLOUDFLARE_API_TOKEN
+    accountIDKey: account_id
+    tunnelNameKey: tunnel_name
+    apiTokenKey: api_token
+
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
