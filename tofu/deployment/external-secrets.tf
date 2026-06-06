@@ -3,7 +3,7 @@ module "helm_external_secret_stores" {
   for_each             = { for k, v in var.helm_external_secret_stores : v.name => v if v.disabled != true && v.secret_store_kind == "ClusterSecretStore" }
   secret_store_name    = each.value.name
   secret_store_kind    = each.value.secret_store_kind
-  namespace            = module.helm["external-secrets"].helm_namespace
+  namespace            = module.helm["external-secrets"].helm_release_namespace
   gcp_project_id       = var.project_id
   service_account_name = module.helm["external-secrets"].service_account_name
   depends_on           = [module.helm["external-secrets"]]
