@@ -1,13 +1,13 @@
 locals {
-  secret_ids    = nonsensitive(toset(compact([for secret in concat(var.google_secrets, local.tfDependentSecrets) : !secret.disabled ? nonsensitive(secret.secret_id) : null])))
+  secret_ids    = nonsensitive(toset(compact([for secret in concat(var.google_secrets, local.tfDependentSecrets) : !try(secret.disabled, false) ? nonsensitive(secret.secret_id) : null])))
   secret_values = { for secret in concat(var.google_secrets, local.tfDependentSecrets) : secret.secret_id => secret }
   tfDependentSecrets = [
     {
       secret_id = "cloudflare-api-token"
       value = jsonencode({
         api_token  = var.cloudflare_api_token
-        tunnel_id  = try(cloudflare_zero_trust_tunnel_cloudflared.example_zero_trust_tunnel_cloudflared.id, null)
-        account_id = try(cloudflare_zero_trust_tunnel_cloudflared.example_zero_trust_tunnel_cloudflared.account_id, null)
+        tunnel_id  = try(cloudflare_zero_trust_tunnel_cloudflared.ingress_tunnel.id, null)
+        account_id = try(cloudflare_zero_trust_tunnel_cloudflared.ingress_tunnel.account_id, null)
       })
       labels = {
         app = "global"
@@ -37,4 +37,5 @@ resource "google_secret_manager_secret_version" "secrets" {
 
   secret      = google_secret_manager_secret.secrets[each.key].id
   secret_data = templatestring(local.secret_values[each.key].value, local.variable_overrides)
+  depends_on  = [cloudflare_zero_trust_tunnel_cloudflared.ingress_tunnel]
 }
