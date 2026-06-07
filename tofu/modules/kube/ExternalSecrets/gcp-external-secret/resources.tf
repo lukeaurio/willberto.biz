@@ -24,11 +24,14 @@ resource "kubernetes_manifest" "this" {
         for item in var.data : merge(
           {
             secretKey = item.secret_key
-            remoteRef = {
-              key = item.remote_key
-            }
-          },
-          item.version != null ? { remoteRef = { key = item.remote_key, version = item.version } } : {},
+            remoteRef = merge(
+              {
+                key = item.remote_key
+              },
+              item.version != null ? { version = item.version } : {},
+              item.property != null ? { property = item.property } : {}
+            )
+          }
         )
       ]
     }
