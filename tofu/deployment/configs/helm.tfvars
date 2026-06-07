@@ -52,7 +52,7 @@ helm_external_secrets = [
   {
     name               = "cloudflare-tunnel-secret"
     namespace          = "cloudflare-ingress"
-    refresh_interval   = "1h0m0s"
+    refresh_interval   = "0h0m10s"
     secret_store_name  = "cluster-gsm-store"
     secret_store_kind  = "ClusterSecretStore"
     target_secret_name = "cloudflare-api-token"
