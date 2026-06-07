@@ -59,8 +59,19 @@ helm_external_secrets = [
     creation_policy    = "Owner"
     data = [
       {
-        secret_key = "CLOUDFLARE_API_TOKEN"
+        secret_key = "accountid"
         remote_key = "cloudflare-api-token"
+        property   = "account_id"
+      },
+      {
+        secret_key = "apitoken"
+        remote_key = "cloudflare-api-token"
+        property   = "api_token"
+      },
+      {
+        secret_key = "tunnelname"
+        remote_key = "cloudflare-api-token"
+        property   = "tunnel_name"
       }
     ]
   }

@@ -89,10 +89,16 @@ variable "data" {
     secret_key = string
     remote_key = string
     version    = optional(string)
+    property   = optional(string)
   }))
 
   validation {
     condition     = length(var.data) > 0
     error_message = "data must contain at least one mapping item."
   }
+  validation {
+    condition     = alltrue([for item in var.data : can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", item.secret_key))])
+    error_message = "Each secret_key in data must be a valid Kubernetes DNS-1123 label."
+  }
+
 }

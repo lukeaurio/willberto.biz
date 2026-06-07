@@ -21,6 +21,11 @@ module "helm_external_secrets" {
   secret_store_kind    = each.value.secret_store_kind
   target_secret_name   = each.value.target_secret_name
   creation_policy      = each.value.creation_policy
-  data                 = each.value.data
-  depends_on           = [module.helm_external_secret_stores, google_secret_manager_secret_version.secrets, module.namespaces]
+  data = [for item in each.value.data : {
+    secret_key = item.secret_key
+    remote_key = try(google_secret_manager_secret_version.secrets[item.remote_key].name, item.remote_key)
+    version    = try(item.version, null)
+    property   = try(item.property, null)
+  }]
+  depends_on = [module.helm_external_secret_stores, google_secret_manager_secret_version.secrets, module.namespaces]
 }

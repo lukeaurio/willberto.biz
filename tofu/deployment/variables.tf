@@ -227,6 +227,7 @@ variable "helm_external_secrets" {
       secret_key = string
       remote_key = string
       version    = optional(string)
+      property   = optional(string)
     }))
     disabled = optional(bool, false)
   }))
