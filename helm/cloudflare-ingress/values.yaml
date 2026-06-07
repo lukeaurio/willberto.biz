@@ -1,9 +1,9 @@
 cloudflare:
   secretRef:
     name: cloudflare-api-token
-    accountIDKey: account_id
-    tunnelNameKey: tunnel_name
-    apiTokenKey: api_token
+    accountIDKey: accountid
+    tunnelNameKey: tunnelname
+    apiTokenKey: apitoken
 
 
 resources:
