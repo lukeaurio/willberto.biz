@@ -1,8 +1,7 @@
 locals {
-  yaml_content      = var.helm_value_file != "" ? [file("${var.helm_value_file}")] : []
-  variables_list    = var.helm_value_file != "" ? concat(local.yaml_content, var.helm_values) : var.helm_values
-  sa_name           = "${var.helm_release_name}-sa"
-  default_gcp_roles = ["roles/iam.workloadIdentityUser"]
+  yaml_content   = var.helm_value_file != "" ? [file("${var.helm_value_file}")] : []
+  variables_list = var.helm_value_file != "" ? concat(local.yaml_content, var.helm_values) : var.helm_values
+  sa_name        = "${var.helm_release_name}-sa"
 }
 
 # This is the helm release resource. It will deploy the helm chart to the kubernetes cluster
@@ -55,6 +54,7 @@ resource "helm_release" "this" {
 
 resource "kubernetes_service_account" "this" {
   count = var.create_service_account ? 1 : 0
+
   metadata {
     name      = local.sa_name
     namespace = var.helm_namespace
@@ -80,9 +80,16 @@ resource "google_service_account" "this" {
 }
 
 resource "google_project_iam_member" "this" {
-  for_each   = var.create_service_account ? toset(var.gcp_roles != null ? distinct(concat(var.gcp_roles, local.default_gcp_roles)) : local.default_gcp_roles) : toset([])
+  for_each   = var.create_service_account ? toset(var.gcp_roles) : toset([])
   project    = var.gcp_project_id
   role       = each.value
   member     = "serviceAccount:${google_service_account.this[0].email}"
   depends_on = [kubernetes_service_account.this]
+}
+
+resource "google_service_account_iam_member" "workload_identity_user" {
+  count              = var.create_service_account ? 1 : 0
+  service_account_id = google_service_account.this[0].name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "serviceAccount:${var.gcp_project_id}.svc.id.goog[${var.helm_namespace}/${local.sa_name}]"
 }

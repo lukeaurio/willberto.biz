@@ -5,6 +5,10 @@ cloudflare:
     tunnelNameKey: tunnelname
     apiTokenKey: apitoken
 
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  name: "cloudflare-ingress-sa"
 
 resources:
   limits:
