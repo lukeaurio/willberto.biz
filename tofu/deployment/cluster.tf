@@ -9,6 +9,10 @@ resource "google_container_cluster" "autopilot" {
   network    = google_compute_network.default.id
   subnetwork = google_compute_subnetwork.default.id
 
+  workload_identity_config {
+    workload_pool = "${var.project_id}.svc.id.goog"
+  }
+
   cluster_autoscaling {
     auto_provisioning_defaults {
       service_account = google_service_account.cluster_autopilot.email
