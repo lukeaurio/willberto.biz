@@ -23,7 +23,7 @@ module "helm_external_secrets" {
   creation_policy      = each.value.creation_policy
   data = [for item in each.value.data : {
     secret_key = item.secret_key
-    remote_key = try(google_secret_manager_secret_version.secrets[item.remote_key].name, item.remote_key)
+    remote_key = try(google_secret_manager_secret.secrets[item.remote_key].secret_id, item.remote_key)
     version    = try(item.version, null)
     property   = try(item.property, null)
   }]
