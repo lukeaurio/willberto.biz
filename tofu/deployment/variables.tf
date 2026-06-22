@@ -82,6 +82,7 @@ variable "helm_releases" {
     values                             = optional(list(string), [])
     values_file                        = optional(string, "")
     replica_count                      = number # When Set to Zero, it reverts to using the Chart's Definition of replicasets
+    timeout                            = optional(number, 300)
     create_service_account             = optional(bool, false)
     create_namespace                   = optional(bool, true)
     service_account_accessible_secrets = optional(list(string), [])

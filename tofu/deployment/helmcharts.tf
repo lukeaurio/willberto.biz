@@ -12,6 +12,7 @@ module "helm" {
   helm_values            = each.value.values
   helm_value_file        = "../../${each.value.values_file}" #Chartpaths are relative to the root of the module
   replica_count          = each.value.replica_count
+  timeout                = each.value.timeout
   create_service_account = each.value.create_service_account
   create_namespace       = each.value.create_namespace
   accessible_secrets     = each.value.service_account_accessible_secrets
@@ -44,6 +45,7 @@ module "helm_with_external_secrets" {
   helm_values            = each.value.values
   helm_value_file        = "../../${each.value.values_file}" #Chartpaths are relative to the root of the module
   replica_count          = each.value.replica_count
+  timeout                = each.value.timeout
   create_service_account = each.value.create_service_account
   create_namespace       = each.value.create_namespace
   accessible_secrets     = each.value.service_account_accessible_secrets
