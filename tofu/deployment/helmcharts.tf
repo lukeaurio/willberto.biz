@@ -3,7 +3,7 @@ module "helm" {
   source                 = "../modules/helm"
   for_each               = { for k, v in var.helm_releases : v.name => v if v.disabled == false && v.uses_external_secret == false }
   gcp_project_id         = var.project_id
-  gcp_project_name       = var.project_name
+  gcp_project_name       = local.project_name_sanitized
   helm_chart_name        = each.value.chart_name
   helm_release_name      = each.value.name
   helm_repository_url    = each.value.repo_url
@@ -35,7 +35,7 @@ module "helm_with_external_secrets" {
   source                 = "../modules/helm"
   for_each               = { for k, v in var.helm_releases : v.name => v if v.disabled == false && v.uses_external_secret == true }
   gcp_project_id         = var.project_id
-  gcp_project_name       = var.project_name
+  gcp_project_name       = local.project_name_sanitized
   helm_chart_name        = each.value.chart_name
   helm_release_name      = each.value.name
   helm_repository_url    = each.value.repo_url
