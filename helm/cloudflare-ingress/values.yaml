@@ -2,7 +2,7 @@ cloudflare:
   secretRef:
     name: cloudflare-api-token
     accountIDKey: accountid
-    tunnelNameKey: tunnelname
+    tunnelNameKey: tunnelid
     apiTokenKey: apitoken
 
 serviceAccount:

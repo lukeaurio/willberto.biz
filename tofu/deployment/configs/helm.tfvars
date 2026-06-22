@@ -69,9 +69,9 @@ helm_external_secrets = [
         property   = "api_token"
       },
       {
-        secret_key = "tunnelname"
+        secret_key = "tunnelid"
         remote_key = "cloudflare-api-token"
-        property   = "tunnel_name"
+        property   = "tunnel_id"
       }
     ]
   }
