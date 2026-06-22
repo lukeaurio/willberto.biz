@@ -18,8 +18,15 @@ resource "helm_release" "this" {
   timeout          = var.timeout
   cleanup_on_fail  = var.cleanup_on_fail
   wait             = var.wait
-  reuse_values     = var.reuse_values
-  description      = var.release_description
+
+  timeouts {
+    create = "30m"
+    update = "30m"
+    delete = "10m"
+  }
+
+  reuse_values = var.reuse_values
+  description  = var.release_description
 
   values = local.variables_list
 
