@@ -25,7 +25,7 @@ helm_releases = [
     replica_count             = 1
   },
   {
-    name                   = "cloudflare-ingress"
+    name                   = "cloudflare-ingress-controller"
     repo_url               = "https://helm.strrl.dev"
     chart_name             = "cloudflare-tunnel-ingress-controller"
     version                = "latest"
