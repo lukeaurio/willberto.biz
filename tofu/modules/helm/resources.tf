@@ -91,5 +91,5 @@ resource "google_service_account_iam_member" "workload_identity_user" {
   count              = var.create_service_account ? 1 : 0
   service_account_id = google_service_account.this[0].name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "serviceAccount:${var.gcp_project_id}.svc.id.goog[${var.helm_namespace}/${local.sa_name}]"
+  member             = "serviceAccount:${var.gcp_project_name}.svc.id.goog[${var.helm_namespace}/${local.sa_name}]"
 }

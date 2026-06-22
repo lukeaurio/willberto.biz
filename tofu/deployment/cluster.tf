@@ -10,7 +10,7 @@ resource "google_container_cluster" "autopilot" {
   subnetwork = google_compute_subnetwork.default.id
 
   workload_identity_config {
-    workload_pool = "${var.project_id}.svc.id.goog"
+    workload_pool = "${var.project_name}.svc.id.goog"
   }
 
   cluster_autoscaling {
