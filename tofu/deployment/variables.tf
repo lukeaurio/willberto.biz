@@ -107,6 +107,15 @@ variable "helm_releases" {
     ])
     error_message = "Helm Charts: replica_count must be a non-negative integer for all releases"
   }
+
+  validation {
+    condition = alltrue([
+      for release in var.helm_releases :
+      release.timeout > 0 && release.timeout == floor(release.timeout)
+    ])
+    error_message = "Helm Charts: timeout must be a positive integer number of seconds for all releases"
+  }
+
   validation {
     condition = alltrue([
       for release in var.helm_releases :
