@@ -34,6 +34,7 @@ helm_releases = [
     create_namespace       = false
     create_service_account = true
     replica_count          = 1
+    timeout                = 900
     uses_external_secret   = true
   }
 

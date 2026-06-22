@@ -82,6 +82,7 @@ variable "helm_releases" {
     values                             = optional(list(string), [])
     values_file                        = optional(string, "")
     replica_count                      = number # When Set to Zero, it reverts to using the Chart's Definition of replicasets
+    timeout                            = optional(number, 300)
     create_service_account             = optional(bool, false)
     create_namespace                   = optional(bool, true)
     service_account_accessible_secrets = optional(list(string), [])
@@ -106,6 +107,15 @@ variable "helm_releases" {
     ])
     error_message = "Helm Charts: replica_count must be a non-negative integer for all releases"
   }
+
+  validation {
+    condition = alltrue([
+      for release in var.helm_releases :
+      release.timeout > 0 && release.timeout == floor(release.timeout)
+    ])
+    error_message = "Helm Charts: timeout must be a positive integer number of seconds for all releases"
+  }
+
   validation {
     condition = alltrue([
       for release in var.helm_releases :
