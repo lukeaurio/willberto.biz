@@ -354,7 +354,7 @@ variable "google_secrets" {
   description = "Optional Google Secret Manager secrets created by Terraform for ExternalSecret testing."
   type = list(object({
     secret_id   = string
-    value       = object({})
+    value       = map(string)
     labels      = optional(map(string), {})
     disabled    = optional(bool, false)
     version_env = optional(string, "example")
