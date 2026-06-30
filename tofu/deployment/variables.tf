@@ -53,6 +53,18 @@ variable "cloudflare_account_id" {
   }
 }
 
+# GitHub Token Configuration
+# This token is used for accessing private GitHub repositories and the GitHub Container Registry (GHCR).
+variable "ghcr_token" {
+  description = "The GitHub Container Registry (GHCR) Token"
+  type        = string
+  sensitive   = true
+  validation {
+    condition     = length(var.ghcr_token) > 0
+    error_message = "The GitHub Container Registry (GHCR) token cannot be empty."
+  }
+}
+
 # Google Cloud Storage Buckets Configuration
 variable "buckets" {
   description = "Map of GCS buckets to create"
@@ -88,6 +100,7 @@ variable "helm_releases" {
     service_account_accessible_secrets = optional(list(string), [])
     service_account_gcp_roles          = optional(list(string), [])
     uses_external_secret               = optional(bool, false) # If true will wait to create the helm chart until after external secrets are created, (for helm charts which need secrets)
+    uses_cf_ingress                    = optional(bool, false) # If true will wait to create the helm chart until after cloudflare-ingress is created, (for helm charts which need ingress)
     disabled                           = optional(bool, false)
   }))
   default = []
@@ -164,6 +177,14 @@ variable "helm_releases" {
       (release.create_namespace == true && release.uses_external_secret == false) || (release.create_namespace == false && release.uses_external_secret == true)
     ])
     error_message = "Helm Charts: Helm releases that use external secrets must have create_namespace set to true to ensure the namespace exists before creating ExternalSecret resources."
+  }
+
+  validation {
+    condition = alltrue([
+      for release in var.helm_releases :
+      (release.uses_cf_ingress == true && release.create_namespace == true) || (release.uses_cf_ingress == false)
+    ])
+    error_message = "Helm Charts: Helm releases that use Cloudflare ingress must have create_namespace set to true to ensure the namespace exists before creating ingress resources."
   }
 }
 
