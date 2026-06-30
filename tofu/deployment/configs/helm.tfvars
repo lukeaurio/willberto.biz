@@ -124,8 +124,8 @@ helm_external_secrets = [
 
 google_secrets = [
   {
-    name = "ghcr-token"
-    secret_data = {
+    secret_id = "ghcr-token"
+    value = {
       docker-server   = "ghcr.io"
       docker-username = "lukeaurio"
       docker-password = "$${ghcr_token}"
