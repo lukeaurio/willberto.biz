@@ -1,5 +1,5 @@
 imagePullSecrets: [
-  name: ghcr-token
+  - name: ghcr-token
 ]
 nameOverride: ""
 fullnameOverride: ""
