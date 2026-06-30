@@ -36,6 +36,19 @@ helm_releases = [
     replica_count          = 1
     timeout                = 900
     uses_external_secret   = true
+  },
+  {
+    name                   = "hugoblog"
+    repo_url               = "https://lukeaurio.github.io/hugoblog-chart"
+    chart_name             = "hugoblog"
+    version                = "latest"
+    namespace              = "hugoblog"
+    values_file            = "helm/hugoblog/values.yaml"
+    create_namespace       = false
+    create_service_account = true
+    replica_count          = 1
+    uses_external_secret   = true
+    uses_cf_ingress        = true
   }
 
 ]
@@ -75,8 +88,48 @@ helm_external_secrets = [
         property   = "tunnel_id"
       }
     ]
+  },
+  {
+    name               = "ghcr-token-secret"
+    namespace          = "hugoblog"
+    refresh_interval   = "0h0m10s"
+    secret_store_name  = "cluster-gsm-store"
+    secret_store_kind  = "ClusterSecretStore"
+    target_secret_name = "ghcr-token"
+    creation_policy    = "Owner"
+    data = [
+      {
+        secret_key = "docker-server"
+        remote_key = "ghcr-token"
+        property   = "docker-server"
+      },
+      {
+        secret_key = "docker-username"
+        remote_key = "ghcr-token"
+        property   = "docker-username"
+      },
+      {
+        secret_key = "docker-password"
+        remote_key = "ghcr-token"
+        property   = "docker-password"
+      },
+      {
+        secret_key = "docker-email"
+        remote_key = "ghcr-token"
+        property   = "docker-email"
+      }
+    ]
   }
 ]
 
 google_secrets = [
+  {
+    secret_id = "ghcr-token"
+    value = {
+      docker-server   = "ghcr.io"
+      docker-username = "lukeaurio"
+      docker-password = "$${ghcr_token}"
+      docker-email    = "lukeaurio@proton.me"
+    }
+  }
 ]

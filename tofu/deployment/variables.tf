@@ -53,6 +53,18 @@ variable "cloudflare_account_id" {
   }
 }
 
+# GitHub Token Configuration
+# This token is used for accessing private GitHub repositories and the GitHub Container Registry (GHCR).
+variable "ghcr_token" {
+  description = "The GitHub Container Registry (GHCR) Token"
+  type        = string
+  sensitive   = true
+  validation {
+    condition     = length(var.ghcr_token) > 0
+    error_message = "The GitHub Container Registry (GHCR) token cannot be empty."
+  }
+}
+
 # Google Cloud Storage Buckets Configuration
 variable "buckets" {
   description = "Map of GCS buckets to create"
@@ -88,6 +100,7 @@ variable "helm_releases" {
     service_account_accessible_secrets = optional(list(string), [])
     service_account_gcp_roles          = optional(list(string), [])
     uses_external_secret               = optional(bool, false) # If true will wait to create the helm chart until after external secrets are created, (for helm charts which need secrets)
+    uses_cf_ingress                    = optional(bool, false) # If true will wait to create the helm chart until after cloudflare-ingress is created, (for helm charts which need ingress)
     disabled                           = optional(bool, false)
   }))
   default = []
@@ -341,7 +354,7 @@ variable "google_secrets" {
   description = "Optional Google Secret Manager secrets created by Terraform for ExternalSecret testing."
   type = list(object({
     secret_id   = string
-    value       = string
+    value       = map(string)
     labels      = optional(map(string), {})
     disabled    = optional(bool, false)
     version_env = optional(string, "example")
@@ -360,7 +373,7 @@ variable "google_secrets" {
   validation {
     condition = alltrue([
       for secret in var.google_secrets :
-      length(secret.value) > 0
+      length(keys(secret.value)) > 0
     ])
     error_message = "Example Google Secrets: value must be non-empty for all items."
   }
