@@ -129,7 +129,7 @@ google_secrets = [
     secret_data = jsonencode({
       docker-server   = "ghcr.io"
       docker-username = "lukeaurio"
-      docker-password = "$${var.github_container_token}"
+      docker-password = "$${var.ghcr_token}"
       docker-email    = "lukeaurio@proton.me"
     })
   }
