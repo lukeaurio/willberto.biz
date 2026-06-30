@@ -124,13 +124,12 @@ helm_external_secrets = [
 
 google_secrets = [
   {
-    name    = "ghcr-token"
-    project = "$${var.project_id}"
-    secret_data = jsonencode({
+    name = "ghcr-token"
+    secret_data = {
       docker-server   = "ghcr.io"
       docker-username = "lukeaurio"
-      docker-password = "$${var.ghcr_token}"
+      docker-password = "$${ghcr_token}"
       docker-email    = "lukeaurio@proton.me"
-    })
+    }
   }
 ]
