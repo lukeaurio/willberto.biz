@@ -178,14 +178,6 @@ variable "helm_releases" {
     ])
     error_message = "Helm Charts: Helm releases that use external secrets must have create_namespace set to true to ensure the namespace exists before creating ExternalSecret resources."
   }
-
-  validation {
-    condition = alltrue([
-      for release in var.helm_releases :
-      (release.uses_cf_ingress == true && release.create_namespace == true) || (release.uses_cf_ingress == false)
-    ])
-    error_message = "Helm Charts: Helm releases that use Cloudflare ingress must have create_namespace set to true to ensure the namespace exists before creating ingress resources."
-  }
 }
 
 # External Secrets SecretStore / ClusterSecretStore configuration
