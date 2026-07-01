@@ -26,7 +26,7 @@ resource "kubernetes_manifest" "this" {
             type          = "kubernetes.io/dockerconfigjson"
             engineversion = "v2"
             data = {
-              ".dockerconfigjson" = "{{ `{{ .dockerconfig }}` }}"
+              ".dockerconfigjson" = "{{ .dockerconfig | toString }}"
             }
           }
         } : {}
