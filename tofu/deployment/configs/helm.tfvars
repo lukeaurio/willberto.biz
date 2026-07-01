@@ -111,7 +111,11 @@ google_secrets = [
   {
     secret_id = "ghcr-token"
     value = {
-      auths = "{\"ghcr.io\": {\"auth\": \"$${ghcr_token}\"}}"
+      auths = {
+        "ghcr.io" = {
+          auth = "$${ghcr_token}"
+        }
+      }
     }
   }
 ]
