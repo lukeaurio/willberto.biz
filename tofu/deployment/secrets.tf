@@ -6,7 +6,7 @@ locals {
       secret_id = "cloudflare-api-token"
       value = {
         api_token  = var.cloudflare_api_token
-        tunnel_id  = try(cloudflare_zero_trust_tunnel_cloudflared.ingress_tunnel.id, null)
+        tunnel_id  = "${var.project_name}-tunnel" #try(cloudflare_zero_trust_tunnel_cloudflared.ingress_tunnel.name, null)
         account_id = var.cloudflare_account_id
       }
       labels = {
