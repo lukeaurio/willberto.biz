@@ -16,10 +16,21 @@ resource "kubernetes_manifest" "this" {
         name = var.secret_store_name
         kind = var.secret_store_kind
       }
-      target = {
-        name           = var.target_secret_name
-        creationPolicy = var.creation_policy
-      }
+      target = merge(
+        {
+          name           = var.target_secret_name
+          creationPolicy = var.creation_policy
+        },
+        var.secret_type == "docker_registry" ? {
+          template = {
+            type          = "kubernetes.io/dockerconfigjson"
+            engineversion = "v2"
+            data = {
+              ".dockerconfigjson" = "{{ `{{ .dockerconfig }}` }}"
+            }
+          }
+        } : {}
+      )
       data = [
         for item in var.data : merge(
           {

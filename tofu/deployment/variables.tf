@@ -242,6 +242,7 @@ variable "helm_external_secrets" {
     resource_labels      = optional(map(string), {})
     resource_annotations = optional(map(string), {})
     refresh_interval     = optional(string, "1h0m0s")
+    secret_type          = optional(string, "generic")
     secret_store_name    = string
     secret_store_kind    = optional(string, "ClusterSecretStore")
     target_secret_name   = string
