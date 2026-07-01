@@ -388,7 +388,7 @@ variable "google_secrets" {
   validation {
     condition = alltrue([
       for secret in var.google_secrets :
-      alltrue([for k, v in secret.value : length(k) > 0 && (trimspace(jsonencode(tostring(v))) > 0 && trimspace(jsonencode(v)) != "{}")])
+      alltrue([for k, v in secret.value : length(k) > 0 && (length(trimspace(jsonencode(v))) > 0 && trimspace(jsonencode(v)) != "{}")])
     ])
     error_message = "Example Google Secrets: kes and values must be non-empty for all items."
   }
