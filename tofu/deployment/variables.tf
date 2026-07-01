@@ -361,7 +361,7 @@ variable "google_secrets" {
   description = "Optional Google Secret Manager secrets created by Terraform for ExternalSecret testing."
   type = list(object({
     secret_id   = string
-    value       = map(object({}))
+    value       = map()
     labels      = optional(map(string), {})
     disabled    = optional(bool, false)
     version_env = optional(string, "example")
@@ -381,6 +381,14 @@ variable "google_secrets" {
     condition = alltrue([
       for secret in var.google_secrets :
       length(keys(secret.value)) > 0
+    ])
+    error_message = "Example Google Secrets: value must be non-empty for all items."
+  }
+
+  validation {
+    condition = alltrue([
+      for secret in var.google_secrets :
+      alltrue([for k, v in secret.value : length(k) > 0 && (length(tostring(v)) > 0 && tostring(v) != "{}")])
     ])
     error_message = "Example Google Secrets: value must be non-empty for all items."
   }
