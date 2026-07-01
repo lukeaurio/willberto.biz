@@ -17,7 +17,7 @@ sites:
     image:
       repository: ghcr.io/lukeaurio/blog-willberto-biz
       pullPolicy: IfNotPresent
-      tag: 4502d62b022ef0d30c476e9bcc481f40d0d9908d
+      tag: latest
     service:
       type: ClusterIP
       port: 80
