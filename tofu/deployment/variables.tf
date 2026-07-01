@@ -55,13 +55,19 @@ variable "cloudflare_account_id" {
 
 # GitHub Token Configuration
 # This token is used for accessing private GitHub repositories and the GitHub Container Registry (GHCR).
+# It should be formatted as base64 encoded string of <username>:<personal_access_token>
 variable "ghcr_token" {
-  description = "The GitHub Container Registry (GHCR) Token"
+  description = "The GitHub Container Registry (GHCR) Auth Token, formatted as base64 encoded string of <username>:<personal_access_token>"
   type        = string
   sensitive   = true
   validation {
     condition     = length(var.ghcr_token) > 0
     error_message = "The GitHub Container Registry (GHCR) token cannot be empty."
+  }
+
+  validation {
+    condition     = can(base64decode(var.ghcr_token))
+    error_message = "The GitHub Container Registry (GHCR) token must be a valid base64 encoded string."
   }
 }
 
