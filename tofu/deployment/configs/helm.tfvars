@@ -93,30 +93,15 @@ helm_external_secrets = [
     name               = "ghcr-token-secret"
     namespace          = "hugoblog"
     refresh_interval   = "0h0m10s"
+    secret_type        = "docker_registry"
     secret_store_name  = "cluster-gsm-store"
     secret_store_kind  = "ClusterSecretStore"
     target_secret_name = "ghcr-token"
     creation_policy    = "Owner"
     data = [
       {
-        secret_key = "docker-server"
+        secret_key = "dockerconfig"
         remote_key = "ghcr-token"
-        property   = "docker-server"
-      },
-      {
-        secret_key = "docker-username"
-        remote_key = "ghcr-token"
-        property   = "docker-username"
-      },
-      {
-        secret_key = "docker-password"
-        remote_key = "ghcr-token"
-        property   = "docker-password"
-      },
-      {
-        secret_key = "docker-email"
-        remote_key = "ghcr-token"
-        property   = "docker-email"
       }
     ]
   }

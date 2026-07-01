@@ -41,6 +41,22 @@ variable "refresh_interval" {
   }
 }
 
+variable "secret_type" {
+  description = "The type of Kubernetes Secret to create. Default is 'Opaque'."
+  type        = string
+  default     = "generic"
+
+  validation {
+    condition     = contains(["generic", "docker_registry"], var.secret_type)
+    error_message = "secret_type must be one of: generic, docker_registry."
+  }
+
+  validation {
+    condition     = (var.secret_type != "docker_registry") || (var.secret_type == "docker_registry" && contains([for item in var.data : item.secret_key], "dockerconfig"))
+    error_message = "When secret_type is 'docker_registry', data must contain an item with secret_key 'dockerconfig'."
+  }
+}
+
 variable "secret_store_name" {
   description = "The SecretStore or ClusterSecretStore name referenced by the ExternalSecret."
   type        = string

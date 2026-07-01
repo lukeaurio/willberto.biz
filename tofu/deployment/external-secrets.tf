@@ -17,6 +17,7 @@ module "helm_external_secrets" {
   resource_labels      = each.value.resource_labels
   resource_annotations = each.value.resource_annotations
   refresh_interval     = each.value.refresh_interval
+  secret_type          = each.value.secret_type
   secret_store_name    = each.value.secret_store_name
   secret_store_kind    = each.value.secret_store_kind
   target_secret_name   = each.value.target_secret_name
