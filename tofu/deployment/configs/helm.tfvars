@@ -111,7 +111,7 @@ google_secrets = [
   {
     secret_id = "ghcr-token"
     value = {
-      docker-server   = "ghcr.io"
+      docker-server   = "https://ghcr.io"
       docker-username = "x-access-token"
       docker-password = "$${ghcr_token}"
       docker-email    = "lukeaurio@proton.me"
