@@ -24,7 +24,7 @@ resource "kubernetes_manifest" "this" {
         var.secret_type == "docker_registry" ? {
           template = {
             type          = "kubernetes.io/dockerconfigjson"
-            engineversion = "v2"
+            engineVersion = "v2"
             data = {
               ".dockerconfigjson" = "{{ .dockerconfig | toString }}"
             }
